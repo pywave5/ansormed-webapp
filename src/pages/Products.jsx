@@ -35,20 +35,20 @@ export default function Products({ categoryId, productsOverride }) {
         <p className="text-gray-500">Нет товаров</p>
       ) : (
         <>
-          {/* всегда 2 колонки */}
+          {/* 2 колонки всегда */}
           <div className="grid grid-cols-2 gap-4">
             {products.map((p) => (
               <div
                 key={p.id}
                 onClick={() => setSelectedProduct(p)}
-                className="bg-white rounded-xl shadow-md hover:shadow-lg transition cursor-pointer overflow-hidden flex flex-col items-center p-3"
+                className="bg-white rounded-xl shadow-md hover:shadow-lg transition cursor-pointer p-3 flex flex-col items-center"
               >
                 {p.image && (
                   <div className="w-full flex justify-center mb-2">
                     <img
                       src={p.image}
                       alt={p.title}
-                      className="h-28 object-contain"
+                      className="h-24 object-contain"
                     />
                   </div>
                 )}
@@ -63,39 +63,42 @@ export default function Products({ categoryId, productsOverride }) {
           </div>
 
           {/* Пагинация */}
-          <div className="flex justify-center items-center gap-2 mt-6">
-            <button
-              className="btn btn-sm"
-              disabled={page === 1}
-              onClick={() => setPage((p) => p - 1)}
-            >
-              Назад
-            </button>
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center gap-2 mt-6">
+              <button
+                className="btn btn-sm"
+                disabled={page === 1}
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+              >
+                Назад
+              </button>
 
-            {Array.from({ length: totalPages }, (_, i) => i + 1)
-              .slice(Math.max(0, page - 3), Math.min(totalPages, page + 2))
-              .map((num) => (
-                <button
-                  key={num}
-                  onClick={() => setPage(num)}
-                  className={`btn btn-sm ${
-                    num === page
-                      ? "btn-primary"
-                      : "btn-outline text-gray-600 border-gray-300"
-                  }`}
-                >
-                  {num}
-                </button>
-              ))}
+              {[...Array(totalPages)].map((_, i) => {
+                const num = i + 1;
+                return (
+                  <button
+                    key={num}
+                    onClick={() => setPage(num)}
+                    className={`btn btn-sm ${
+                      num === page
+                        ? "btn-primary"
+                        : "btn-outline text-gray-600 border-gray-300"
+                    }`}
+                  >
+                    {num}
+                  </button>
+                );
+              })}
 
-            <button
-              className="btn btn-sm"
-              disabled={page === totalPages}
-              onClick={() => setPage((p) => p + 1)}
-            >
-              Вперёд
-            </button>
-          </div>
+              <button
+                className="btn btn-sm"
+                disabled={page === totalPages}
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              >
+                Вперёд
+              </button>
+            </div>
+          )}
         </>
       )}
 

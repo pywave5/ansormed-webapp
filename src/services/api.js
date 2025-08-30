@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const API_URL = "https://ac98331984c3.ngrok-free.app/api/v1";
+// const API_URL = "https://ac98331984c3.ngrok-free.app/api/v1";
+const API_URL = "http://localhost:8000/api/v1";
 
 // пока можно хардкодить ключ (потом вытащим из .env)
 const API_SECRET_KEY = "dB5ooRWJEXEzsV3q5uj2x6wNGdxlveX6N5f3vhcTkOE";
@@ -21,13 +22,11 @@ export const getCategories = async () => {
 // --- товары по категории ---
 export async function getProducts(categoryId, page = 1) {
   let url = `/products/?page=${page}`;
-  
   if (categoryId) {
     url += `&category=${categoryId}`;
   }
-
   const res = await api.get(url);
-  return res.data; // { count, total_pages, results }
+  return res.data; // JSON: {results, count, total_pages, ...}
 }
 
 // --- поиск товаров ---
