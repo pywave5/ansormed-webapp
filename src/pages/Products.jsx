@@ -28,6 +28,35 @@ export default function Products({ categoryId, productsOverride }) {
     load();
   }, [categoryId, productsOverride, page]);
 
+  // функция генерации массива страниц (с "...")
+  const getPageNumbers = () => {
+    const pages = [];
+    const delta = 2; // сколько показывать вокруг активной
+
+    const left = Math.max(2, page - delta);
+    const right = Math.min(totalPages - 1, page + delta);
+
+    pages.push(1);
+
+    if (left > 2) {
+      pages.push("...");
+    }
+
+    for (let i = left; i <= right; i++) {
+      pages.push(i);
+    }
+
+    if (right < totalPages - 1) {
+      pages.push("...");
+    }
+
+    if (totalPages > 1) {
+      pages.push(totalPages);
+    }
+
+    return pages;
+  };
+
   return (
     <div>
       <h2 className="text-xl font-bold mb-3">Товары</h2>
@@ -35,74 +64,76 @@ export default function Products({ categoryId, productsOverride }) {
         <p className="text-gray-500">Нет товаров</p>
       ) : (
         <>
-          {/* 2 колонки всегда */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {products.map((p) => (
               <div
                 key={p.id}
                 onClick={() => setSelectedProduct(p)}
-                className="bg-white rounded-xl shadow-md hover:shadow-lg transition cursor-pointer p-3 flex flex-col items-center"
+                className="card bg-white shadow-md hover:shadow-xl transition cursor-pointer"
               >
                 {p.image && (
-                  <div className="w-full flex justify-center mb-2">
+                  <figure className="bg-gray-50 flex justify-center">
                     <img
                       src={p.image}
                       alt={p.title}
-                      className="h-24 object-contain"
+                      className="h-32 object-contain"
                     />
-                  </div>
+                  </figure>
                 )}
-                <h3 className="text-sm font-semibold text-gray-900 text-center line-clamp-2">
-                  {p.title}
-                </h3>
-                <span className="text-green-600 font-bold mt-1">
-                  {p.price} сум
-                </span>
+                <div className="card-body p-4">
+                  <h3 className="font-semibold text-gray-900 text-sm">
+                    {p.title}
+                  </h3>
+                  <span className="font-bold text-green-600 text-sm">
+                    {p.price.toLocaleString()} сум
+                  </span>
+                </div>
               </div>
             ))}
           </div>
 
           {/* Пагинация */}
-          {totalPages > 1 && (
-            <div className="flex justify-center items-center gap-2 mt-6">
-              <button
-                className="btn btn-sm"
-                disabled={page === 1}
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-              >
-                Назад
-              </button>
+          <div className="flex justify-center items-center gap-2 mt-6 flex-wrap">
+            <button
+              className="btn btn-sm"
+              disabled={page === 1}
+              onClick={() => setPage((p) => p - 1)}
+            >
+              Назад
+            </button>
 
-              {[...Array(totalPages)].map((_, i) => {
-                const num = i + 1;
-                return (
-                  <button
-                    key={num}
-                    onClick={() => setPage(num)}
-                    className={`btn btn-sm ${
-                      num === page
-                        ? "btn-primary"
-                        : "btn-outline text-gray-600 border-gray-300"
-                    }`}
-                  >
-                    {num}
-                  </button>
-                );
-              })}
+            {getPageNumbers().map((num, idx) =>
+              num === "..." ? (
+                <span key={idx} className="px-2 text-gray-500">
+                  ...
+                </span>
+              ) : (
+                <button
+                  key={num}
+                  onClick={() => setPage(num)}
+                  className={`btn btn-sm ${
+                    num === page
+                      ? "btn-primary"
+                      : "btn-outline text-gray-600 border-gray-300"
+                  }`}
+                >
+                  {num}
+                </button>
+              )
+            )}
 
-              <button
-                className="btn btn-sm"
-                disabled={page === totalPages}
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              >
-                Вперёд
-              </button>
-            </div>
-          )}
+            <button
+              className="btn btn-sm"
+              disabled={page === totalPages}
+              onClick={() => setPage((p) => p + 1)}
+            >
+              Вперёд
+            </button>
+          </div>
         </>
       )}
 
-      {/* Модалка */}
+      {/* Модальное окно */}
       {selectedProduct && (
         <ProductModal
           product={selectedProduct}

@@ -1,6 +1,5 @@
 import axios from "axios";
 
-// const API_URL = "https://ac98331984c3.ngrok-free.app/api/v1";
 const API_URL = "http://localhost:8000/api/v1";
 
 // пока можно хардкодить ключ (потом вытащим из .env)
