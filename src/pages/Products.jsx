@@ -31,62 +31,50 @@ export default function Products({ categoryId, productsOverride }) {
   return (
     <div>
       <h2 className="text-xl font-bold mb-3">Товары</h2>
-
       {products.length === 0 ? (
         <p className="text-gray-500">Нет товаров</p>
       ) : (
         <>
-          {/* Карточки по 2 в ряд */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {products.map((p) => (
               <div
                 key={p.id}
                 onClick={() => setSelectedProduct(p)}
-                className="bg-white rounded-xl shadow hover:shadow-md transition cursor-pointer p-3 flex flex-col"
+                className="card bg-white shadow-md hover:shadow-lg transition cursor-pointer rounded-xl overflow-hidden"
               >
                 {p.image && (
-                  <img
-                    src={p.image}
-                    alt={p.title}
-                    className="h-28 object-contain mx-auto mb-2"
-                  />
+                  <figure className="bg-gray-50 flex items-center justify-center h-48">
+                    <img
+                      src={p.image}
+                      alt={p.title}
+                      className="h-40 object-contain"
+                    />
+                  </figure>
                 )}
-                <h3 className="text-sm font-semibold text-gray-800 line-clamp-2">
-                  {p.title}
-                </h3>
-                <div className="flex justify-between items-center mt-2">
-                  <span className="text-green-600 font-bold text-sm">
+                <div className="card-body text-center">
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    {p.title}
+                  </h3>
+                  <span className="text-green-600 font-bold mt-2 block">
                     {p.price} сум
                   </span>
-                  <button
-                    className="btn btn-primary btn-xs"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedProduct(p);
-                    }}
-                  >
-                    +
-                  </button>
                 </div>
               </div>
             ))}
           </div>
 
           {/* Пагинация */}
-          <div className="flex justify-center items-center gap-2 mt-6 flex-wrap">
+          <div className="flex justify-center items-center gap-2 mt-6">
             <button
-              className="btn btn-sm btn-outline"
+              className="btn btn-sm"
               disabled={page === 1}
               onClick={() => setPage((p) => p - 1)}
             >
-              ⬅
+              Назад
             </button>
 
             {Array.from({ length: totalPages }, (_, i) => i + 1)
-              .slice(
-                Math.max(0, page - 3),
-                Math.min(totalPages, page + 2)
-              )
+              .slice(Math.max(0, page - 3), Math.min(totalPages, page + 2))
               .map((num) => (
                 <button
                   key={num}
@@ -102,11 +90,11 @@ export default function Products({ categoryId, productsOverride }) {
               ))}
 
             <button
-              className="btn btn-sm btn-outline"
+              className="btn btn-sm"
               disabled={page === totalPages}
               onClick={() => setPage((p) => p + 1)}
             >
-              ➡
+              Вперёд
             </button>
           </div>
         </>

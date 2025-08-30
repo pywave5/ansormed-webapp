@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Plus, Minus } from "lucide-react";  // 👈 импорт иконок
+import { Plus, Minus } from "lucide-react";
 
 export default function ProductModal({ product, onClose }) {
   const [quantity, setQuantity] = useState(1);
