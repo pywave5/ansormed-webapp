@@ -13,7 +13,7 @@ export default function Profile() {
   if (!user) {
     return (
       <div className="text-center text-gray-500">
-        Нет данных о пользователе 😢
+        Нет данных о пользователе
       </div>
     );
   }
@@ -41,11 +41,6 @@ export default function Profile() {
 
       {/* ID */}
       <p className="text-sm text-gray-400">ID: {user.id}</p>
-
-      {/* Кнопка */}
-      <button className="px-4 py-2 bg-blue-600 text-white rounded-xl shadow hover:bg-blue-700 transition">
-        ⚙️ Настройки
-      </button>
     </div>
   );
 }
