@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "./components/Header";
-import Footer from "./components/Footer";
 import BottomNav from "./components/BottomNav";
+import SplashScreen from "./components/SplashScreen";
 
 import Catalog from "./pages/Catalog";
 import Cart from "./pages/Cart";
@@ -13,6 +13,19 @@ tg.ready();
 
 export default function App() {
   const [activePage, setActivePage] = useState("catalog");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return <SplashScreen />;
+  }
 
   return (
     <div className="min-h-screen bg-gray-100 pb-16">
