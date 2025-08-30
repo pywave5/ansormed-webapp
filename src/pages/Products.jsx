@@ -28,35 +28,6 @@ export default function Products({ categoryId, productsOverride }) {
     load();
   }, [categoryId, productsOverride, page]);
 
-  // функция генерации массива страниц (с "...")
-  const getPageNumbers = () => {
-    const pages = [];
-    const delta = 2; // сколько показывать вокруг активной
-
-    const left = Math.max(2, page - delta);
-    const right = Math.min(totalPages - 1, page + delta);
-
-    pages.push(1);
-
-    if (left > 2) {
-      pages.push("...");
-    }
-
-    for (let i = left; i <= right; i++) {
-      pages.push(i);
-    }
-
-    if (right < totalPages - 1) {
-      pages.push("...");
-    }
-
-    if (totalPages > 1) {
-      pages.push(totalPages);
-    }
-
-    return pages;
-  };
-
   return (
     <div>
       <h2 className="text-xl font-bold mb-3">Товары</h2>
@@ -64,27 +35,28 @@ export default function Products({ categoryId, productsOverride }) {
         <p className="text-gray-500">Нет товаров</p>
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* 2 товара в ряд всегда */}
+          <div className="grid grid-cols-2 gap-4">
             {products.map((p) => (
               <div
                 key={p.id}
                 onClick={() => setSelectedProduct(p)}
-                className="card bg-white shadow-md hover:shadow-xl transition cursor-pointer"
+                className="bg-white rounded-xl shadow-md hover:shadow-xl transition cursor-pointer overflow-hidden"
               >
                 {p.image && (
                   <figure className="bg-gray-50 flex justify-center">
                     <img
                       src={p.image}
                       alt={p.title}
-                      className="h-32 object-contain"
+                      className="h-24 object-contain"
                     />
                   </figure>
                 )}
-                <div className="card-body p-4">
-                  <h3 className="font-semibold text-gray-900 text-sm">
+                <div className="p-3 text-center">
+                  <h3 className="font-medium text-gray-900 text-sm truncate">
                     {p.title}
                   </h3>
-                  <span className="font-bold text-green-600 text-sm">
+                  <span className="font-bold text-green-600 text-sm block mt-1">
                     {p.price.toLocaleString()} сум
                   </span>
                 </div>
@@ -102,12 +74,9 @@ export default function Products({ categoryId, productsOverride }) {
               Назад
             </button>
 
-            {getPageNumbers().map((num, idx) =>
-              num === "..." ? (
-                <span key={idx} className="px-2 text-gray-500">
-                  ...
-                </span>
-              ) : (
+            {Array.from({ length: totalPages }, (_, i) => i + 1)
+              .slice(Math.max(0, page - 3), Math.min(totalPages, page + 2))
+              .map((num) => (
                 <button
                   key={num}
                   onClick={() => setPage(num)}
@@ -119,8 +88,7 @@ export default function Products({ categoryId, productsOverride }) {
                 >
                   {num}
                 </button>
-              )
-            )}
+              ))}
 
             <button
               className="btn btn-sm"
@@ -133,7 +101,7 @@ export default function Products({ categoryId, productsOverride }) {
         </>
       )}
 
-      {/* Модальное окно */}
+      {/* Модалка */}
       {selectedProduct && (
         <ProductModal
           product={selectedProduct}
