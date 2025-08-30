@@ -31,84 +31,82 @@ export default function Products({ categoryId, productsOverride }) {
   return (
     <div>
       <h2 className="text-xl font-bold mb-3">Товары</h2>
+
       {products.length === 0 ? (
         <p className="text-gray-500">Нет товаров</p>
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          {/* Карточки по 2 в ряд */}
+          <div className="grid grid-cols-2 gap-4">
             {products.map((p) => (
               <div
                 key={p.id}
                 onClick={() => setSelectedProduct(p)}
-                className="card bg-base-100 shadow-md hover:shadow-xl transition cursor-pointer"
+                className="bg-white rounded-xl shadow hover:shadow-md transition cursor-pointer p-3 flex flex-col"
               >
                 {p.image && (
-                  <figure className="bg-gray-50">
-                    <img
-                      src={p.image}
-                      alt={p.title}
-                      className="h-40 object-contain"
-                    />
-                  </figure>
+                  <img
+                    src={p.image}
+                    alt={p.title}
+                    className="h-28 object-contain mx-auto mb-2"
+                  />
                 )}
-                <div className="card-body">
-                  <h3 className="card-title text-base">{p.title}</h3>
-                  <p className="text-sm text-gray-500 line-clamp-2">
-                    {p.description}
-                  </p>
-                  <div className="card-actions justify-between items-center mt-3">
-                    <span className="font-bold text-green-600">
-                      {p.price} сум
-                    </span>
-                    <button
-                      className="btn btn-primary btn-sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedProduct(p);
-                      }}
-                    >
-                      В корзину
-                    </button>
-                  </div>
+                <h3 className="text-sm font-semibold text-gray-800 line-clamp-2">
+                  {p.title}
+                </h3>
+                <div className="flex justify-between items-center mt-2">
+                  <span className="text-green-600 font-bold text-sm">
+                    {p.price} сум
+                  </span>
+                  <button
+                    className="btn btn-primary btn-xs"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedProduct(p);
+                    }}
+                  >
+                    +
+                  </button>
                 </div>
               </div>
             ))}
           </div>
 
           {/* Пагинация */}
-          <div className="flex justify-center items-center gap-2 mt-6">
+          <div className="flex justify-center items-center gap-2 mt-6 flex-wrap">
             <button
-              className="btn btn-sm"
+              className="btn btn-sm btn-outline"
               disabled={page === 1}
               onClick={() => setPage((p) => p - 1)}
             >
-              Назад
+              ⬅
             </button>
 
-            {/* Номера страниц */}
             {Array.from({ length: totalPages }, (_, i) => i + 1)
-            .slice(
-              Math.max(0, page - 3),
-              Math.min(totalPages, page + 2)
-            )
-            .map((num) => (
-              <button
-                key={num}
-                onClick={() => setPage(num)}
-                className={`btn btn-sm ${
-                  num === page ? "btn-primary" : "btn-outline text-gray-600 border-gray-300"
-                }`}
-              >
-                {num}
-              </button>
-            ))}
+              .slice(
+                Math.max(0, page - 3),
+                Math.min(totalPages, page + 2)
+              )
+              .map((num) => (
+                <button
+                  key={num}
+                  onClick={() => setPage(num)}
+                  className={`btn btn-sm ${
+                    num === page
+                      ? "btn-primary"
+                      : "btn-outline text-gray-600 border-gray-300"
+                  }`}
+                >
+                  {num}
+                </button>
+              ))}
 
             <button
-              className="btn btn-sm"
+              className="btn btn-sm btn-outline"
               disabled={page === totalPages}
               onClick={() => setPage((p) => p + 1)}
             >
-              Вперёд 
+              ➡
             </button>
           </div>
         </>
