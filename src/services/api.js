@@ -1,21 +1,24 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:8000/api/v1";
+const API_URL = import.meta.env.VITE_API_URL;
+const API_SECRET_KEY = import.meta.env.VITE_API_SECRET_KEY;
 
-// пока можно хардкодить ключ (потом вытащим из .env)
-const API_SECRET_KEY = "dB5ooRWJEXEzsV3q5uj2x6wNGdxlveX6N5f3vhcTkOE";
+if (!API_URL) {
+  console.error("❌ API_URL не задан в .env.local");
+}
 
 const api = axios.create({
   baseURL: API_URL,
   headers: {
     "X-API-KEY": API_SECRET_KEY,
+    "ngrok-skip-browser-warning": "true", // убираем экран ngrok
   },
 });
 
 // --- категории ---
 export const getCategories = async () => {
   const res = await api.get("/categories/");
-  return res.data; // потому что это сразу массив
+  return res.data;
 };
 
 // --- товары по категории ---
@@ -25,7 +28,7 @@ export async function getProducts(categoryId, page = 1) {
     url += `&category=${categoryId}`;
   }
   const res = await api.get(url);
-  return res.data; // JSON: {results, count, total_pages, ...}
+  return res.data;
 }
 
 // --- поиск товаров ---
