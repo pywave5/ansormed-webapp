@@ -35,30 +35,29 @@ export default function Products({ categoryId, productsOverride }) {
         <p className="text-gray-500">Нет товаров</p>
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          {/* всегда 2 колонки */}
+          <div className="grid grid-cols-2 gap-4">
             {products.map((p) => (
               <div
                 key={p.id}
                 onClick={() => setSelectedProduct(p)}
-                className="card bg-white shadow-md hover:shadow-lg transition cursor-pointer rounded-xl overflow-hidden"
+                className="bg-white rounded-xl shadow-md hover:shadow-lg transition cursor-pointer overflow-hidden flex flex-col items-center p-3"
               >
                 {p.image && (
-                  <figure className="bg-gray-50 flex items-center justify-center h-48">
+                  <div className="w-full flex justify-center mb-2">
                     <img
                       src={p.image}
                       alt={p.title}
-                      className="h-40 object-contain"
+                      className="h-28 object-contain"
                     />
-                  </figure>
+                  </div>
                 )}
-                <div className="card-body text-center">
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    {p.title}
-                  </h3>
-                  <span className="text-green-600 font-bold mt-2 block">
-                    {p.price} сум
-                  </span>
-                </div>
+                <h3 className="text-sm font-semibold text-gray-900 text-center line-clamp-2">
+                  {p.title}
+                </h3>
+                <span className="text-green-600 font-bold mt-1">
+                  {p.price} сум
+                </span>
               </div>
             ))}
           </div>
@@ -100,7 +99,7 @@ export default function Products({ categoryId, productsOverride }) {
         </>
       )}
 
-      {/* Модальное окно */}
+      {/* Модалка */}
       {selectedProduct && (
         <ProductModal
           product={selectedProduct}
