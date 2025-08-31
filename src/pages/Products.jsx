@@ -76,7 +76,10 @@ export default function Products({ categoryId, productsOverride }) {
             <button
               className="btn btn-sm"
               disabled={page === 1}
-              onClick={() => setPage((p) => p - 1)}
+              onClick={() => {
+                tap(); // вибрация
+                setPage((p) => p - 1);
+              }}
             >
               Назад
             </button>
@@ -86,7 +89,10 @@ export default function Products({ categoryId, productsOverride }) {
               .map((num) => (
                 <button
                   key={num}
-                  onClick={() => setPage(num)}
+                  onClick={() => {
+                    tap(); // вибрация
+                    setPage(num);
+                  }}
                   className={`btn btn-sm ${
                     num === page
                       ? "btn-primary"
@@ -100,7 +106,10 @@ export default function Products({ categoryId, productsOverride }) {
             <button
               className="btn btn-sm"
               disabled={page === totalPages}
-              onClick={() => setPage((p) => p + 1)}
+              onClick={() => {
+                tap(); // вибрация
+                setPage((p) => p + 1);
+              }}
             >
               Вперёд
             </button>

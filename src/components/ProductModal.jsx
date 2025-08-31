@@ -1,18 +1,23 @@
 import { useEffect, useState } from "react";
 import { Plus, Minus } from "lucide-react";
 import { useCart } from "../context/CartContext";
+import { useHaptic } from "../hooks/useHaptic";
 
 export default function ProductModal({ product, onClose }) {
   const [quantity, setQuantity] = useState(1);
   const { addToCart } = useCart();
+  const { light, success, warning } = useHaptic(); // 👈 новый хук
 
   useEffect(() => {
     const handleEsc = (e) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") {
+        light();
+        onClose();
+      }
     };
     window.addEventListener("keydown", handleEsc);
     return () => window.removeEventListener("keydown", handleEsc);
-  }, [onClose]);
+  }, [onClose, light]);
 
   const handleQuantityChange = (val) => {
     if (val < 1) return;
@@ -21,23 +26,8 @@ export default function ProductModal({ product, onClose }) {
 
   const handleAddToCart = () => {
     addToCart(product, quantity);
-    haptic("success");
+    success(); // 👈 вибрация успеха при добавлении
     onClose();
-  };
-
-  // универсальная вибрация / хаптик
-  const haptic = (type = "light") => {
-    if (window.Telegram?.WebApp?.HapticFeedback) {
-      if (type === "success") {
-        window.Telegram.WebApp.HapticFeedback.notificationOccurred("success");
-      } else if (type === "warning") {
-        window.Telegram.WebApp.HapticFeedback.notificationOccurred("warning");
-      } else {
-        window.Telegram.WebApp.HapticFeedback.impactOccurred(type);
-      }
-    } else if (navigator.vibrate) {
-      navigator.vibrate(30);
-    }
   };
 
   return (
@@ -53,7 +43,7 @@ export default function ProductModal({ product, onClose }) {
         <button
           className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
           onClick={() => {
-            haptic("light");
+            light();
             onClose();
           }}
         >
@@ -89,7 +79,7 @@ export default function ProductModal({ product, onClose }) {
           <button
             className="btn btn-sm btn-outline btn-neutral"
             onClick={() => {
-              haptic("light");
+              light();
               handleQuantityChange(quantity - 1);
             }}
           >
@@ -119,7 +109,7 @@ export default function ProductModal({ product, onClose }) {
             onBlur={() => {
               if (!quantity || quantity < 1) {
                 setQuantity(1);
-                haptic("warning");
+                warning(); // 👈 вибрация предупреждения
               }
             }}
             className="input input-bordered w-20 text-center"
@@ -128,7 +118,7 @@ export default function ProductModal({ product, onClose }) {
           <button
             className="btn btn-sm btn-outline btn-neutral"
             onClick={() => {
-              haptic("light");
+              light();
               handleQuantityChange(quantity + 1);
             }}
           >
@@ -141,10 +131,10 @@ export default function ProductModal({ product, onClose }) {
           <button
             className="btn btn-outline btn-secondary flex-1"
             onClick={() => {
-              haptic("light");
+              light();
               onClose();
             }}
-            >
+          >
             Назад
           </button>
           <button
