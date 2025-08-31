@@ -36,3 +36,12 @@ export async function searchProducts(query) {
   const res = await api.get(`/products/?search=${query}`);
   return res.data;
 }
+
+// --- история заказов ---
+export async function getMyOrders(telegramId) {
+  if (!telegramId) {
+    throw new Error("❌ telegramId обязателен для getMyOrders");
+  }
+  const res = await api.get(`/orders/me/?telegram_id=${telegramId}`);
+  return res.data;
+}

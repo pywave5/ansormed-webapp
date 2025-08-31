@@ -1,4 +1,4 @@
-import { ShoppingCart, User, Grid } from "lucide-react";
+import { ShoppingCart, User, Grid, Clock } from "lucide-react"; // 👈 добавил Clock
 import { useCart } from "../context/CartContext";
 import { useHaptic } from "../hooks/useHaptic";
 
@@ -14,17 +14,23 @@ export default function BottomNav({ active, setActive }) {
 
   return (
     <nav className="fixed bottom-0 left-0 w-full bg-white shadow-md border-t flex justify-around py-2">
+      {/* Каталог */}
       <button
         onClick={() => handleClick("catalog")}
-        className={`flex flex-col items-center ${active === "catalog" ? "text-blue-600" : "text-gray-500"}`}
+        className={`flex flex-col items-center ${
+          active === "catalog" ? "text-blue-600" : "text-gray-500"
+        }`}
       >
         <Grid size={24} />
         <span className="text-xs mt-1">Каталог</span>
       </button>
 
+      {/* Корзина */}
       <button
         onClick={() => handleClick("cart")}
-        className={`relative flex flex-col items-center ${active === "cart" ? "text-blue-600" : "text-gray-500"}`}
+        className={`relative flex flex-col items-center ${
+          active === "cart" ? "text-blue-600" : "text-gray-500"
+        }`}
       >
         <ShoppingCart size={24} />
         {totalCount > 0 && (
@@ -35,9 +41,23 @@ export default function BottomNav({ active, setActive }) {
         <span className="text-xs mt-1">Корзина</span>
       </button>
 
+      {/* История */}
+      <button
+        onClick={() => handleClick("history")}
+        className={`flex flex-col items-center ${
+          active === "history" ? "text-blue-600" : "text-gray-500"
+        }`}
+      >
+        <Clock size={24} />
+        <span className="text-xs mt-1">История</span>
+      </button>
+
+      {/* Профиль */}
       <button
         onClick={() => handleClick("profile")}
-        className={`flex flex-col items-center ${active === "profile" ? "text-blue-600" : "text-gray-500"}`}
+        className={`flex flex-col items-center ${
+          active === "profile" ? "text-blue-600" : "text-gray-500"
+        }`}
       >
         <User size={24} />
         <span className="text-xs mt-1">Профиль</span>
