@@ -1,9 +1,11 @@
 import { useCart } from "../context/CartContext";
 import { Trash2 } from "lucide-react";
 import emptyCart from "../media/empty-cart.png";
+import { useHaptic } from "../hooks/useHaptic"; // подключаем хук
 
 export default function Cart() {
   const { cart, removeFromCart, clearCart } = useCart();
+  const { light, medium, heavy, success, error } = useHaptic(); // деструктурируем
 
   if (cart.length === 0) {
     return (
@@ -59,7 +61,10 @@ export default function Cart() {
                 {(item.quantity * item.price).toLocaleString()} сум
               </p>
               <button
-                onClick={() => removeFromCart(item.id)}
+                onClick={() => {
+                  removeFromCart(item.id);
+                  light(); // лёгкая вибрация при удалении
+                }}
                 className="p-2 rounded-full hover:bg-red-100 transition"
               >
                 <Trash2 className="w-5 h-5 text-red-500" />
@@ -76,7 +81,10 @@ export default function Cart() {
       </div>
 
       <button
-        onClick={clearCart}
+        onClick={() => {
+          clearCart();
+          success(); // вибрация "успех" при оформлении заказа
+        }}
         className="mt-6 w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition"
       >
         Оформить заказ
