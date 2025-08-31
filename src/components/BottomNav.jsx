@@ -1,27 +1,30 @@
 import { ShoppingCart, User, Grid } from "lucide-react";
 import { useCart } from "../context/CartContext";
+import { useHaptic } from "../hooks/useHaptic";
 
 export default function BottomNav({ active, setActive }) {
   const { cart } = useCart();
   const totalCount = cart.reduce((acc, item) => acc + (item.quantity || 1), 0);
+  const { tap } = useHaptic();
+
+  const handleClick = (menu) => {
+    tap(); // вибрация при переходе
+    setActive(menu);
+  };
 
   return (
     <nav className="fixed bottom-0 left-0 w-full bg-white shadow-md border-t flex justify-around py-2">
       <button
-        onClick={() => setActive("catalog")}
-        className={`flex flex-col items-center ${
-          active === "catalog" ? "text-blue-600" : "text-gray-500"
-        }`}
+        onClick={() => handleClick("catalog")}
+        className={`flex flex-col items-center ${active === "catalog" ? "text-blue-600" : "text-gray-500"}`}
       >
         <Grid size={24} />
-        <span className="text-xs">Каталог</span>
+        <span className="text-xs mt-1">Каталог</span>
       </button>
 
       <button
-        onClick={() => setActive("cart")}
-        className={`relative flex flex-col items-center ${
-          active === "cart" ? "text-blue-600" : "text-gray-500"
-        }`}
+        onClick={() => handleClick("cart")}
+        className={`relative flex flex-col items-center ${active === "cart" ? "text-blue-600" : "text-gray-500"}`}
       >
         <ShoppingCart size={24} />
         {totalCount > 0 && (
@@ -33,13 +36,11 @@ export default function BottomNav({ active, setActive }) {
       </button>
 
       <button
-        onClick={() => setActive("profile")}
-        className={`flex flex-col items-center ${
-          active === "profile" ? "text-blue-600" : "text-gray-500"
-        }`}
+        onClick={() => handleClick("profile")}
+        className={`flex flex-col items-center ${active === "profile" ? "text-blue-600" : "text-gray-500"}`}
       >
         <User size={24} />
-        <span className="text-xs">Профиль</span>
+        <span className="text-xs mt-1">Профиль</span>
       </button>
     </nav>
   );

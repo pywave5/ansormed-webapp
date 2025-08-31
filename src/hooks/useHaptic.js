@@ -22,5 +22,6 @@ export function useHaptic() {
     success: () => haptic("success"),
     warning: () => haptic("warning"),
     error: () => haptic("error"),
+    tap: () => haptic("light"),
   };
 }
