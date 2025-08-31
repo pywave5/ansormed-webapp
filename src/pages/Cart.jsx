@@ -54,7 +54,7 @@ export default function Cart() {
         onClick={clearCart}
         className="mt-6 w-full bg-blue-600 text-white py-2 rounded-xl hover:bg-blue-700"
       >
-        ✅ Оформить заказ
+        Оформить заказ
       </button>
     </div>
   );
