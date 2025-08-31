@@ -6,10 +6,10 @@ import SplashScreen from "./components/SplashScreen";
 import Catalog from "./pages/Catalog";
 import Cart from "./pages/Cart";
 import Profile from "./pages/Profile";
+import { useHaptic } from "./hooks/useHaptic";
 
 import { tg } from "./services/telegram";
-import useHaptic from "./hooks/useHaptic"; // <-- подключаем наш хук
-
+ 
 tg.ready();
 
 export default function App() {
