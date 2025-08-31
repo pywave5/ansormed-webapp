@@ -1,23 +1,18 @@
 import { useEffect, useState } from "react";
 import { Plus, Minus } from "lucide-react";
 import { useCart } from "../context/CartContext";
-import { useHaptic } from "../hooks/useHaptic";
 
 export default function ProductModal({ product, onClose }) {
   const [quantity, setQuantity] = useState(1);
   const { addToCart } = useCart();
-  const { haptic } = useHaptic(); // ✅ подключаем хук
 
   useEffect(() => {
     const handleEsc = (e) => {
-      if (e.key === "Escape") {
-        haptic("light");
-        onClose();
-      }
+      if (e.key === "Escape") onClose();
     };
     window.addEventListener("keydown", handleEsc);
     return () => window.removeEventListener("keydown", handleEsc);
-  }, [onClose, haptic]);
+  }, [onClose]);
 
   const handleQuantityChange = (val) => {
     if (val < 1) return;
@@ -26,8 +21,23 @@ export default function ProductModal({ product, onClose }) {
 
   const handleAddToCart = () => {
     addToCart(product, quantity);
-    haptic("success"); // 🎉 подтверждение
+    haptic("success");
     onClose();
+  };
+
+  // универсальная вибрация / хаптик
+  const haptic = (type = "light") => {
+    if (window.Telegram?.WebApp?.HapticFeedback) {
+      if (type === "success") {
+        window.Telegram.WebApp.HapticFeedback.notificationOccurred("success");
+      } else if (type === "warning") {
+        window.Telegram.WebApp.HapticFeedback.notificationOccurred("warning");
+      } else {
+        window.Telegram.WebApp.HapticFeedback.impactOccurred(type);
+      }
+    } else if (navigator.vibrate) {
+      navigator.vibrate(30);
+    }
   };
 
   return (
@@ -94,10 +104,13 @@ export default function ProductModal({ product, onClose }) {
             value={quantity}
             onChange={(e) => {
               const value = e.target.value;
+
+              // разрешаем временно пустое поле
               if (value === "") {
                 setQuantity("");
                 return;
               }
+
               const val = Number(value);
               if (!isNaN(val)) {
                 setQuantity(val);
@@ -106,7 +119,7 @@ export default function ProductModal({ product, onClose }) {
             onBlur={() => {
               if (!quantity || quantity < 1) {
                 setQuantity(1);
-                haptic("warning"); // ⚠️ неверный ввод
+                haptic("warning");
               }
             }}
             className="input input-bordered w-20 text-center"
@@ -131,7 +144,7 @@ export default function ProductModal({ product, onClose }) {
               haptic("light");
               onClose();
             }}
-          >
+            >
             Назад
           </button>
           <button
