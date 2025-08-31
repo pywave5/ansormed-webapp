@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getProducts } from "../services/api";
 import ProductModal from "../components/ProductModal";
+import { useHaptic } from "../hooks/useHaptic"; // 👈 импортируем
 
 export default function Products({ categoryId, productsOverride }) {
   const [products, setProducts] = useState([]);
@@ -8,6 +9,8 @@ export default function Products({ categoryId, productsOverride }) {
 
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+
+  const { tap } = useHaptic();
 
   useEffect(() => {
     if (productsOverride) {
@@ -28,6 +31,11 @@ export default function Products({ categoryId, productsOverride }) {
     load();
   }, [categoryId, productsOverride, page]);
 
+  const handleSelectProduct = (product) => {
+    tap(); // 👈 вибрация при выборе товара
+    setSelectedProduct(product);
+  };
+
   return (
     <div>
       <h2 className="text-xl font-bold mb-3">Товары</h2>
@@ -35,12 +43,11 @@ export default function Products({ categoryId, productsOverride }) {
         <p className="text-gray-500">Нет товаров</p>
       ) : (
         <>
-          {/* 2 товара в ряд всегда */}
           <div className="grid grid-cols-2 gap-4">
             {products.map((p) => (
               <div
                 key={p.id}
-                onClick={() => setSelectedProduct(p)}
+                onClick={() => handleSelectProduct(p)} // 👈 вызываем вибрацию
                 className="bg-white rounded-xl shadow-md hover:shadow-xl transition cursor-pointer overflow-hidden"
               >
                 {p.image && (
