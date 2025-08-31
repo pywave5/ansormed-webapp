@@ -4,7 +4,7 @@ import { useCart } from "../context/CartContext";
 
 export default function ProductModal({ product, onClose }) {
   const [quantity, setQuantity] = useState(1);
-  const { addToCart } = useCart(); // 👈 берем addToCart
+  const { addToCart } = useCart();
 
   useEffect(() => {
     const handleEsc = (e) => {
@@ -20,8 +20,8 @@ export default function ProductModal({ product, onClose }) {
   };
 
   const handleAddToCart = () => {
-    addToCart(product, quantity); // 👈 добавляем с количеством
-    onClose(); // 👈 закрываем модалку
+    addToCart(product, quantity); // добавляем с выбранным количеством
+    onClose();
   };
 
   return (
@@ -33,7 +33,7 @@ export default function ProductModal({ product, onClose }) {
         className="bg-white rounded-2xl shadow-lg max-w-lg w-full p-6 relative"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Кнопка закрытия */}
+        {/* Закрытие */}
         <button
           className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
           onClick={onClose}
@@ -59,11 +59,11 @@ export default function ProductModal({ product, onClose }) {
 
         {/* Цена */}
         <p className="text-green-600 font-semibold mb-3">
-          {product?.price?.toLocaleString()} сум
+          {product.price.toLocaleString()} сум
         </p>
 
         {/* Описание */}
-        <p className="text-gray-600 mb-4">{product?.description}</p>
+        <p className="text-gray-600 mb-4">{product.description}</p>
 
         {/* Количество */}
         <div className="flex items-center gap-2 mb-6">
@@ -98,7 +98,7 @@ export default function ProductModal({ product, onClose }) {
           </button>
           <button
             className="btn btn-primary flex-1"
-            onClick={handleAddToCart} // 👈 обработчик
+            onClick={handleAddToCart}
           >
             В корзину
           </button>
