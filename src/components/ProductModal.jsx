@@ -21,13 +21,20 @@ export default function ProductModal({ product, onClose }) {
 
   const handleAddToCart = () => {
     addToCart(product, quantity);
+    haptic("success");
     onClose();
   };
 
   // универсальная вибрация / хаптик
-  const haptic = () => {
+  const haptic = (type = "light") => {
     if (window.Telegram?.WebApp?.HapticFeedback) {
-      window.Telegram.WebApp.HapticFeedback.impactOccurred("light");
+      if (type === "success") {
+        window.Telegram.WebApp.HapticFeedback.notificationOccurred("success");
+      } else if (type === "warning") {
+        window.Telegram.WebApp.HapticFeedback.notificationOccurred("warning");
+      } else {
+        window.Telegram.WebApp.HapticFeedback.impactOccurred(type);
+      }
     } else if (navigator.vibrate) {
       navigator.vibrate(30);
     }
@@ -45,7 +52,10 @@ export default function ProductModal({ product, onClose }) {
         {/* Закрытие */}
         <button
           className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
-          onClick={onClose}
+          onClick={() => {
+            haptic("light");
+            onClose();
+          }}
         >
           ✕
         </button>
@@ -79,7 +89,7 @@ export default function ProductModal({ product, onClose }) {
           <button
             className="btn btn-sm btn-outline btn-neutral"
             onClick={() => {
-              haptic();
+              haptic("light");
               handleQuantityChange(quantity - 1);
             }}
           >
@@ -109,6 +119,7 @@ export default function ProductModal({ product, onClose }) {
             onBlur={() => {
               if (!quantity || quantity < 1) {
                 setQuantity(1);
+                haptic("warning");
               }
             }}
             className="input input-bordered w-20 text-center"
@@ -117,7 +128,7 @@ export default function ProductModal({ product, onClose }) {
           <button
             className="btn btn-sm btn-outline btn-neutral"
             onClick={() => {
-              haptic();
+              haptic("light");
               handleQuantityChange(quantity + 1);
             }}
           >
@@ -129,8 +140,11 @@ export default function ProductModal({ product, onClose }) {
         <div className="flex justify-between gap-3">
           <button
             className="btn btn-outline btn-secondary flex-1"
-            onClick={onClose}
-          >
+            onClick={() => {
+              haptic("light");
+              onClose();
+            }}
+            >
             Назад
           </button>
           <button
