@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { getProducts } from "../services/api";
 import ProductModal from "../components/ProductModal";
-import { useHaptic } from "../hooks/useHaptic";
 
 export default function Products({ categoryId, productsOverride }) {
   const [products, setProducts] = useState([]);
@@ -9,8 +8,6 @@ export default function Products({ categoryId, productsOverride }) {
 
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-
-  const haptic = useHaptic();
 
   useEffect(() => {
     if (productsOverride) {
@@ -43,10 +40,7 @@ export default function Products({ categoryId, productsOverride }) {
             {products.map((p) => (
               <div
                 key={p.id}
-                onClick={() => {
-                  setSelectedProduct(p);
-                  haptic.light();
-                }}
+                onClick={() => setSelectedProduct(p)}
                 className="bg-white rounded-xl shadow-md hover:shadow-xl transition cursor-pointer overflow-hidden"
               >
                 {p.image && (
@@ -75,10 +69,7 @@ export default function Products({ categoryId, productsOverride }) {
             <button
               className="btn btn-sm"
               disabled={page === 1}
-              onClick={() => {
-                setPage((p) => p - 1);
-                haptic.light();
-              }}
+              onClick={() => setPage((p) => p - 1)}
             >
               Назад
             </button>
@@ -88,10 +79,7 @@ export default function Products({ categoryId, productsOverride }) {
               .map((num) => (
                 <button
                   key={num}
-                  onClick={() => {
-                    setPage(num);
-                    haptic.medium();
-                  }}
+                  onClick={() => setPage(num)}
                   className={`btn btn-sm ${
                     num === page
                       ? "btn-primary"
@@ -105,10 +93,7 @@ export default function Products({ categoryId, productsOverride }) {
             <button
               className="btn btn-sm"
               disabled={page === totalPages}
-              onClick={() => {
-                setPage((p) => p + 1);
-                haptic.light();
-              }}
+              onClick={() => setPage((p) => p + 1)}
             >
               Вперёд
             </button>

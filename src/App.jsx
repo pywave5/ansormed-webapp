@@ -6,17 +6,14 @@ import SplashScreen from "./components/SplashScreen";
 import Catalog from "./pages/Catalog";
 import Cart from "./pages/Cart";
 import Profile from "./pages/Profile";
-import { useHaptic } from "./hooks/useHaptic";
 
 import { tg } from "./services/telegram";
- 
+
 tg.ready();
 
 export default function App() {
   const [activePage, setActivePage] = useState("catalog");
   const [loading, setLoading] = useState(true);
-
-  const { impact } = useHaptic(); // получаем вибрацию
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -25,11 +22,6 @@ export default function App() {
 
     return () => clearTimeout(timer);
   }, []);
-
-  // реагируем на смену страницы
-  useEffect(() => {
-    impact("light"); // лёгкая вибрация при переходе
-  }, [activePage]);
 
   if (loading) {
     return <SplashScreen />;
