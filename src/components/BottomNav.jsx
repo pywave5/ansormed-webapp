@@ -1,6 +1,10 @@
 import { ShoppingCart, User, Grid } from "lucide-react";
+import { useCart } from "../context/CartContext";
 
 export default function BottomNav({ active, setActive }) {
+  const { cart } = useCart();
+  const totalCount = cart.reduce((acc, item) => acc + (item.quantity || 1), 0);
+
   return (
     <nav className="fixed bottom-0 left-0 w-full bg-white shadow-md border-t flex justify-around py-2">
       <button
@@ -15,12 +19,17 @@ export default function BottomNav({ active, setActive }) {
 
       <button
         onClick={() => setActive("cart")}
-        className={`flex flex-col items-center ${
+        className={`relative flex flex-col items-center ${
           active === "cart" ? "text-blue-600" : "text-gray-500"
         }`}
       >
         <ShoppingCart size={24} />
-        <span className="text-xs">Корзина</span>
+        {totalCount > 0 && (
+          <span className="absolute -top-1 -right-2 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full">
+            {totalCount}
+          </span>
+        )}
+        <span className="text-xs mt-1">Корзина</span>
       </button>
 
       <button
