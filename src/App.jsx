@@ -18,9 +18,9 @@ export default function App() {
   useEffect(() => {
 
     tg.expand();
-    tg.setBackgroundColor('#ffffff');
+    tg.setBackgroundColor('#2563eb');
     tg.enableClosingConfirmation();
-    
+
     const timer = setTimeout(() => {
       setLoading(false);
     }, 1500);
