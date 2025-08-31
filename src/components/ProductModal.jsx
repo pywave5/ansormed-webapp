@@ -20,13 +20,21 @@ export default function ProductModal({ product, onClose }) {
   }, [onClose, light]);
 
   const handleQuantityChange = (val) => {
-    if (val < 1) return;
+    if (val < 1) {
+      warning();
+      return;
+    }
+    if (val > 10000) {
+      setQuantity(10000);
+      warning(); // вибрация при превышении лимита
+      return;
+    }
     setQuantity(val);
   };
 
   const handleAddToCart = () => {
     addToCart(product, quantity);
-    success(); // 👈 вибрация успеха при добавлении
+    success(); // вибрация успеха при добавлении
     onClose();
   };
 
@@ -90,7 +98,6 @@ export default function ProductModal({ product, onClose }) {
             type="text"
             inputMode="numeric"
             pattern="[0-9]*"
-            min="1"
             value={quantity}
             onChange={(e) => {
               const value = e.target.value;
@@ -103,13 +110,16 @@ export default function ProductModal({ product, onClose }) {
 
               const val = Number(value);
               if (!isNaN(val)) {
-                setQuantity(val);
+                handleQuantityChange(val);
               }
             }}
             onBlur={() => {
               if (!quantity || quantity < 1) {
                 setQuantity(1);
-                warning(); // 👈 вибрация предупреждения
+                warning(); // вибрация предупреждения
+              } else if (quantity > 10000) {
+                setQuantity(10000);
+                warning(); // вибрация предупреждения при превышении лимита
               }
             }}
             className="input input-bordered w-20 text-center"

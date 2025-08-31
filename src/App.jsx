@@ -16,6 +16,13 @@ export default function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+
+    tg.expand();
+    tg.setBackgroundColor('#ffffff');
+
+    tg.BackButton.hide();
+    tg.setHeaderColor('secondary_bg_color');
+
     const timer = setTimeout(() => {
       setLoading(false);
     }, 1500);
