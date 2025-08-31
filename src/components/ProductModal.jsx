@@ -20,8 +20,17 @@ export default function ProductModal({ product, onClose }) {
   };
 
   const handleAddToCart = () => {
-    addToCart(product, quantity); // добавляем с выбранным количеством
+    addToCart(product, quantity);
     onClose();
+  };
+
+  // универсальная вибрация / хаптик
+  const haptic = () => {
+    if (window.Telegram?.WebApp?.HapticFeedback) {
+      window.Telegram.WebApp.HapticFeedback.impactOccurred("light");
+    } else if (navigator.vibrate) {
+      navigator.vibrate(30);
+    }
   };
 
   return (
@@ -69,20 +78,33 @@ export default function ProductModal({ product, onClose }) {
         <div className="flex items-center gap-2 mb-6">
           <button
             className="btn btn-sm btn-outline btn-neutral"
-            onClick={() => handleQuantityChange(quantity - 1)}
+            onClick={() => {
+              haptic();
+              handleQuantityChange(quantity - 1);
+            }}
           >
             <Minus size={16} />
           </button>
+
           <input
-            type="number"
+            type="text"                // вместо number
+            inputMode="numeric"        // открывает цифровую клаву
+            pattern="[0-9]*"           // только цифры
             min="1"
             value={quantity}
-            onChange={(e) => handleQuantityChange(Number(e.target.value))}
+            onChange={(e) => {
+              const val = Number(e.target.value);
+              if (!isNaN(val)) handleQuantityChange(val);
+            }}
             className="input input-bordered w-20 text-center"
           />
+
           <button
             className="btn btn-sm btn-outline btn-neutral"
-            onClick={() => handleQuantityChange(quantity + 1)}
+            onClick={() => {
+              haptic();
+              handleQuantityChange(quantity + 1);
+            }}
           >
             <Plus size={16} />
           </button>
