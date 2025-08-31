@@ -87,14 +87,29 @@ export default function ProductModal({ product, onClose }) {
           </button>
 
           <input
-            type="text"                // вместо number
-            inputMode="numeric"        // открывает цифровую клаву
-            pattern="[0-9]*"           // только цифры
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
             min="1"
             value={quantity}
             onChange={(e) => {
-              const val = Number(e.target.value);
-              if (!isNaN(val)) handleQuantityChange(val);
+              const value = e.target.value;
+
+              // разрешаем временно пустое поле
+              if (value === "") {
+                setQuantity("");
+                return;
+              }
+
+              const val = Number(value);
+              if (!isNaN(val)) {
+                setQuantity(val);
+              }
+            }}
+            onBlur={() => {
+              if (!quantity || quantity < 1) {
+                setQuantity(1);
+              }
             }}
             className="input input-bordered w-20 text-center"
           />
