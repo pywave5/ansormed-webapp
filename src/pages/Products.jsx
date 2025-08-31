@@ -84,9 +84,21 @@ export default function Products({ categoryId, productsOverride }) {
               Назад
             </button>
 
-            {Array.from({ length: totalPages }, (_, i) => i + 1)
-              .slice(Math.max(0, page - 3), Math.min(totalPages, page + 2))
-              .map((num) => (
+            {(() => {
+              let pagesToShow = [];
+
+              if (totalPages <= 3) {
+                // если всего 3 или меньше страниц — показываем все
+                pagesToShow = Array.from({ length: totalPages }, (_, i) => i + 1);
+              } else if (page === 1) {
+                pagesToShow = [1, 2, 3];
+              } else if (page === totalPages) {
+                pagesToShow = [totalPages - 2, totalPages - 1, totalPages];
+              } else {
+                pagesToShow = [page - 1, page, page + 1];
+              }
+
+              return pagesToShow.map((num) => (
                 <button
                   key={num}
                   onClick={() => {
@@ -101,7 +113,8 @@ export default function Products({ categoryId, productsOverride }) {
                 >
                   {num}
                 </button>
-              ))}
+              ));
+            })()}
 
             <button
               className="btn btn-sm"
