@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { Plus, Minus } from "lucide-react";
+import { useCart } from "../context/CartContext";
 
 export default function ProductModal({ product, onClose }) {
   const [quantity, setQuantity] = useState(1);
+  const { addToCart } = useCart(); // 👈 берем addToCart
 
   useEffect(() => {
     const handleEsc = (e) => {
@@ -15,6 +17,11 @@ export default function ProductModal({ product, onClose }) {
   const handleQuantityChange = (val) => {
     if (val < 1) return;
     setQuantity(val);
+  };
+
+  const handleAddToCart = () => {
+    addToCart(product, quantity); // 👈 добавляем с количеством
+    onClose(); // 👈 закрываем модалку
   };
 
   return (
@@ -83,10 +90,16 @@ export default function ProductModal({ product, onClose }) {
 
         {/* Действия */}
         <div className="flex justify-between gap-3">
-          <button className="btn btn-outline btn-secondary flex-1" onClick={onClose}>
+          <button
+            className="btn btn-outline btn-secondary flex-1"
+            onClick={onClose}
+          >
             Назад
           </button>
-          <button className="btn btn-primary flex-1">
+          <button
+            className="btn btn-primary flex-1"
+            onClick={handleAddToCart} // 👈 обработчик
+          >
             В корзину
           </button>
         </div>
