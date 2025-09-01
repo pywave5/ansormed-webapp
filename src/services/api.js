@@ -64,7 +64,6 @@ export async function getOrCreateCart(telegramId, username, phoneNumber, custome
   const res = await api.get(`/orders/`, {
     params: { telegram_id: telegramId, status: "draft" },
   });
-  console.log("Создание заказа, payload:", payload);
   if (Array.isArray(res.data) && res.data.length > 0) {
     return res.data[0];
   }
@@ -79,7 +78,6 @@ export async function getOrCreateCart(telegramId, username, phoneNumber, custome
   };
 
   const createRes = await api.post(`/orders/`, payload);
-  console.log("Ответ сервера getOrCreateCart:", res.data);
   return createRes.data;
 }
 
