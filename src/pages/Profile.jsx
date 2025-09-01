@@ -30,7 +30,7 @@ export default function Profile() {
       )}
 
       {/* Имя */}
-      <h2 className="text-xl font-semibold">
+      <h2 className="text-gray-800 text-xl font-semibold">
         {user.first_name} {user.last_name || ""}
       </h2>
 
