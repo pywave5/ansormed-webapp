@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { getMyOrders } from "../services/api";
+import { useHaptic } from "../hooks/useHaptic";
 
 export default function History({ telegramId }) {
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const { tap } = useHaptic();
 
   useEffect(() => {
     if (telegramId) {
@@ -35,7 +37,10 @@ export default function History({ telegramId }) {
           {orders.map((order) => (
             <div
               key={order.id}
-              onClick={() => setSelectedOrder(order)}
+              onClick={() => {
+                tap();
+                setSelectedOrder(order);
+              }}
               className="bg-white text-black rounded-xl shadow-md p-4 cursor-pointer hover:bg-gray-100 transition"
             >
               <p className="font-semibold">Заказ №{order.id}</p>
@@ -45,6 +50,7 @@ export default function History({ telegramId }) {
               <p className="text-green-600 font-bold">
                 Сумма: {formatPrice(order.total_cost)}
               </p>
+              <p className="text-gray-500 text-sm">Статус: {order.status}</p>
             </div>
           ))}
         </div>
@@ -53,28 +59,52 @@ export default function History({ telegramId }) {
       {/* Модалка с деталями */}
       {selectedOrder && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white text-black rounded-xl p-6 w-96 shadow-lg">
+          <div className="bg-white text-black rounded-xl p-6 w-96 max-h-[90vh] overflow-y-auto shadow-lg">
             <h3 className="text-lg font-bold mb-3">
-              Детали заказа №{selectedOrder.id}
+              Заказ №{selectedOrder.id}
             </h3>
-            <p>{formatDate(selectedOrder.created_at)}</p>
-            <p>{formatPrice(selectedOrder.total_cost)}</p>
-            <p className="text-gray-600 mt-2">
-              Статус:{" "}
-              <span className="font-semibold">{selectedOrder.status}</span>
+            <p className="text-gray-600">{formatDate(selectedOrder.created_at)}</p>
+            <p className="text-gray-600">Статус: {selectedOrder.status}</p>
+            <p className="text-green-600 font-bold mt-2">
+              {formatPrice(selectedOrder.total_cost)}
             </p>
-            {/* Здесь можно вывести товары */}
-            {selectedOrder.items && (
-              <ul className="mt-3 space-y-1">
+
+            {/* Список товаров */}
+            {selectedOrder.items && selectedOrder.items.length > 0 ? (
+              <ul className="mt-4 space-y-3">
                 {selectedOrder.items.map((item) => (
-                  <li key={item.id}>
-                    {item.name} × {item.quantity}
+                  <li
+                    key={item.id}
+                    className="flex items-center gap-3 border-b pb-2"
+                  >
+                    {item.product?.image && (
+                      <img
+                        src={item.product.image}
+                        alt={item.product.title}
+                        className="w-12 h-12 object-contain rounded"
+                      />
+                    )}
+                    <div className="flex-1">
+                      <p className="font-semibold">{item.product.title}</p>
+                      <p className="text-sm text-gray-500">
+                        {formatPrice(item.product.price)} × {item.quantity}
+                      </p>
+                    </div>
+                    <p className="font-bold text-gray-800">
+                      {formatPrice(item.total_price)}
+                    </p>
                   </li>
                 ))}
               </ul>
+            ) : (
+              <p className="text-gray-400 mt-3">Товары отсутствуют</p>
             )}
+
             <button
-              onClick={() => setSelectedOrder(null)}
+              onClick={() => {
+                tap();
+                setSelectedOrder(null);
+              }}
               className="mt-4 w-full bg-red-500 text-white py-2 rounded-lg hover:bg-red-600"
             >
               Закрыть
