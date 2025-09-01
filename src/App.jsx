@@ -9,6 +9,7 @@ import Profile from "./pages/Profile";
 import History from "./pages/History";
 
 import { tg } from "./services/telegram";
+import { CartProvider } from "./context/CartContext";
 
 tg.ready();
 
@@ -22,34 +23,35 @@ export default function App() {
     tg.BackButton.hide();
     tg.setHeaderColor("secondary_bg_color");
 
-    // 📌 получаем Telegram ID пользователя
     if (tg.initDataUnsafe?.user?.id) {
       setTelegramId(tg.initDataUnsafe.user.id);
     }
 
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1500);
-
+    const timer = setTimeout(() => setLoading(false), 1500);
     return () => clearTimeout(timer);
   }, []);
 
-  if (loading) {
-    return <SplashScreen />;
-  }
+  if (loading) return <SplashScreen />;
 
   return (
-    <div className="min-h-screen bg-gray-100 pb-16">
-      <Header />
+    <CartProvider
+      telegramId={telegramId}
+      username={tg.initDataUnsafe?.user?.username}
+      phoneNumber={tg.initDataUnsafe?.user?.phone}
+      customerName={tg.initDataUnsafe?.user?.first_name}
+    >
+      <div className="min-h-screen bg-gray-100 pb-16">
+        <Header />
 
-      <div className="max-w-6xl mx-auto p-6 space-y-8">
-        {activePage === "catalog" && <Catalog />}
-        {activePage === "cart" && <Cart />}
-        {activePage === "profile" && <Profile />}
-        {activePage === "history" && <History telegramId={telegramId} />}
+        <div className="max-w-6xl mx-auto p-6 space-y-8">
+          {activePage === "catalog" && <Catalog />}
+          {activePage === "cart" && <Cart />}
+          {activePage === "profile" && <Profile />}
+          {activePage === "history" && <History telegramId={telegramId} />}
+        </div>
+
+        <BottomNav active={activePage} setActive={setActivePage} />
       </div>
-
-      <BottomNav active={activePage} setActive={setActivePage} />
-    </div>
+    </CartProvider>
   );
 }
