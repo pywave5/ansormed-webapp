@@ -82,10 +82,12 @@ export async function getOrCreateCart(telegramId, username, phoneNumber, custome
 }
 
 // добавить товар в корзину
-export async function addItemToCart(orderId, productId, quantity) {
+export async function addItemToCart(orderId, productId, quantity, updateCart) {
   const payload = { order: orderId, product: productId, quantity };
-  const res = await api.post(`/order-items/`, payload);
-  return res.data;
+  await api.post(`/order-items/`, payload);
+
+  const updatedCart = await getOrCreateCart(telegramId, username, phoneNumber, customerName);
+  updateCart(updatedCart);
 }
 
 // обновить количество товара в корзине

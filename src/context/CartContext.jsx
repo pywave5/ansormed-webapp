@@ -1,8 +1,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import {
-  getUserCart,
   getOrCreateCart,
-  addItemToCart,
+  addItemToCart as apiAddItemToCart,
   updateCartItem,
   removeCartItem,
   clearUserCart,
@@ -12,20 +11,21 @@ import {
 const CartContext = createContext();
 
 export function CartProvider({ children, telegramId, username, phoneNumber, customerName }) {
-  const [cart, setCart] = useState(null); // корзина = объект заказа (с items внутри)
-  const [loading, setLoading] = useState(false);
+  const [cart, setCart] = useState(null); // корзина = объект заказа с items внутри
+  const [loading, setLoading] = useState(true);
 
-  // загрузка корзины при старте
+  // загрузка корзины при старте или смене пользователя
   useEffect(() => {
     if (telegramId) {
       loadCart();
     }
   }, [telegramId]);
 
+  // создаём или получаем корзину
   async function loadCart() {
     setLoading(true);
     try {
-      const data = await getUserCart(telegramId);
+      const data = await getOrCreateCart(telegramId, username, phoneNumber, customerName);
       setCart(data);
     } catch (err) {
       console.error("Ошибка при загрузке корзины:", err);
@@ -34,27 +34,31 @@ export function CartProvider({ children, telegramId, username, phoneNumber, cust
     }
   }
 
+  // добавить товар
   async function addToCart(product, quantity = 1) {
-    try {
-      let order = cart;
-      if (!order) {
-        order = await getOrCreateCart(telegramId, username, phoneNumber, customerName);
-        setCart(order);
-      }
+    if (!cart) {
+      await loadCart();
+    }
 
-      const existingItem = order.items?.find((i) => i.product === product.id);
+    try {
+      // проверяем, есть ли товар в корзине
+      const existingItem = cart.items?.find((i) => i.product.id === product.id);
+
       if (existingItem) {
+        // обновляем количество
         await updateCartItem(existingItem.id, existingItem.quantity + quantity);
       } else {
-        await addItemToCart(order.id, product.id, quantity);
+        // создаём новый элемент
+        await apiAddItemToCart(cart.id, product.id, quantity);
       }
 
-      await loadCart(); // обновляем корзину после изменения
+      await loadCart(); // подтягиваем актуальные данные
     } catch (err) {
       console.error("Ошибка при добавлении в корзину:", err);
     }
   }
 
+  // удалить товар
   async function removeFromCart(itemId) {
     try {
       await removeCartItem(itemId);
@@ -64,6 +68,7 @@ export function CartProvider({ children, telegramId, username, phoneNumber, cust
     }
   }
 
+  // очистить корзину
   async function clearCart() {
     try {
       await clearUserCart(telegramId);
@@ -73,6 +78,7 @@ export function CartProvider({ children, telegramId, username, phoneNumber, cust
     }
   }
 
+  // оформить заказ
   async function checkout() {
     try {
       if (!cart) return null;
