@@ -25,6 +25,7 @@ export function CartProvider({ children, telegramId, username, phoneNumber, cust
     try {
       const data = await getOrCreateCart(telegramId, username, phoneNumber, customerName);
       setCart(data);
+      return data;
     } catch (err) {
       console.error("Ошибка при загрузке корзины:", err);
     } finally {
@@ -34,12 +35,13 @@ export function CartProvider({ children, telegramId, username, phoneNumber, cust
 
   // ✅ Добавить товар
   async function addToCart(product, quantity = 1) {
-    if (!cart) {
-      await loadCart();
+    let currentCart = cart;
+    if (!currentCart) {
+      currentCart = await loadCart(); // ⬅️ теперь всегда есть актуальная корзина
     }
 
     try {
-      const existingItem = cart.items?.find((i) => i.product.id === product.id);
+      const existingItem = currentCart.items?.find((i) => i.product.id === product.id);
 
       if (existingItem) {
         // локально обновляем
@@ -57,7 +59,7 @@ export function CartProvider({ children, telegramId, username, phoneNumber, cust
           console.error("Ошибка при обновлении товара:", err)
         );
       } else {
-        // сразу создаём локальный item-заглушку
+        // создаём временный item
         const tempId = `temp-${Date.now()}`;
         const newLocalItem = {
           id: tempId,
@@ -70,8 +72,8 @@ export function CartProvider({ children, telegramId, username, phoneNumber, cust
           items: [...prev.items, newLocalItem],
         }));
 
-        // потом заменяем на настоящий item из API
-        const newItem = await apiAddItemToCart(cart.id, product.id, quantity);
+        // потом заменяем на реальный item
+        const newItem = await apiAddItemToCart(currentCart.id, product.id, quantity);
         setCart((prev) => ({
           ...prev,
           items: prev.items.map((i) => (i.id === tempId ? newItem : i)),
