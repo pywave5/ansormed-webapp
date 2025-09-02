@@ -56,14 +56,22 @@ export default function History({ telegramId }) {
         </div>
       )}
 
-      {/* Модалка с деталями */}
+     {/* Модалка с деталями */}
       {selectedOrder && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white text-black rounded-xl p-6 w-96 max-h-[90vh] overflow-y-auto shadow-lg">
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          onClick={() => setSelectedOrder(null)} // клик по внешке
+        >
+          <div
+            className="bg-white text-black rounded-xl p-6 w-96 max-h-[90vh] overflow-y-auto shadow-lg"
+            onClick={(e) => e.stopPropagation()} // блокируем закрытие при клике внутри
+          >
             <h3 className="text-lg font-bold mb-3">
               Заказ №{selectedOrder.id}
             </h3>
-            <p className="text-gray-600">{formatDate(selectedOrder.created_at)}</p>
+            <p className="text-gray-600">
+              {formatDate(selectedOrder.created_at)}
+            </p>
             <p className="text-gray-600">Статус: {selectedOrder.status}</p>
             <p className="text-green-600 font-bold mt-2">
               {formatPrice(selectedOrder.total_cost)}
