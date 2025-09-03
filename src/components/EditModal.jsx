@@ -3,38 +3,15 @@ import { useState, useEffect } from "react";
 export default function EditModal({ isOpen, onClose, field, label, value, onSave }) {
   const [inputValue, setInputValue] = useState(value || "");
 
-  useEffect(() => {
-    setInputValue(value || "");
-  }, [value, isOpen]);
-
-  if (!isOpen) return null;
-
-  // автоформатирование даты
-  const handleDateInput = (e) => {
-    let val = e.target.value.replace(/\D/g, ""); // только цифры
-    if (val.length > 8) val = val.slice(0, 8);
-
-    let formatted = val;
-    if (val.length > 4) {
-      formatted = val.slice(0, 2) + "." + val.slice(2, 4) + "." + val.slice(4);
-    } else if (val.length > 2) {
-      formatted = val.slice(0, 2) + "." + val.slice(2);
+  const formatPhone = (val) => {
+    val = val.replace(/\D/g, "");
+    if (!val.startsWith("998")) {
+      if (val.startsWith("8")) {
+        val = "998" + val.slice(1);
+      } else {
+        val = "998" + val;
+      }
     }
-
-    setInputValue(formatted);
-  };
-
-  // автоформатирование телефона
-  const handlePhoneInput = (e) => {
-    let val = e.target.value.replace(/\D/g, ""); // только цифры
-    if (val.startsWith("998")) {
-      val = val; // ок
-    } else if (val.startsWith("8")) {
-      val = "998" + val.slice(1);
-    } else if (!val.startsWith("998")) {
-      val = "998" + val;
-    }
-
     if (val.length > 12) val = val.slice(0, 12);
 
     let formatted = "+998";
@@ -43,19 +20,45 @@ export default function EditModal({ isOpen, onClose, field, label, value, onSave
     if (val.length > 8) formatted += " " + val.slice(8, 10);
     if (val.length > 10) formatted += " " + val.slice(10, 12);
 
-    setInputValue(formatted);
+    return formatted;
   };
 
-  // выбор обработчика ввода
+  // форматирование даты
+  const formatDate = (val) => {
+    val = val.replace(/\D/g, ""); // только цифры
+    if (val.length > 8) val = val.slice(0, 8);
+
+    if (val.length > 4) {
+      return val.slice(0, 2) + "." + val.slice(2, 4) + "." + val.slice(4);
+    } else if (val.length > 2) {
+      return val.slice(0, 2) + "." + val.slice(2);
+    }
+    return val;
+  };
+
+  // автоформат при открытии модалки
+  useEffect(() => {
+    if (field === "phone_number" && value) {
+      setInputValue(formatPhone(value));
+    } else if (field === "birth_date" && value) {
+      setInputValue(formatDate(value));
+    } else {
+      setInputValue(value || "");
+    }
+  }, [value, isOpen, field]);
+
+  if (!isOpen) return null;
+
   const handleInputChange = (e) => {
-    if (field === "birth_date") return handleDateInput(e);
-    if (field === "phone_number") return handlePhoneInput(e);
-    setInputValue(e.target.value);
+    let val = e.target.value;
+    if (field === "birth_date") return setInputValue(formatDate(val));
+    if (field === "phone_number") return setInputValue(formatPhone(val));
+    setInputValue(val);
   };
 
   return (
     <div
-      className="fixed inset-0 bg-black/40 z-50 flex justify-center items-end"
+      className="fixed inset-0 h-screen w-screen bg-black/40 z-50 flex justify-center items-end"
       onClick={onClose}
     >
       <div
