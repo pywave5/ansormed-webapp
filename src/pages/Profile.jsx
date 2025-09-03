@@ -19,11 +19,33 @@ export default function Profile() {
     fetchUser();
   }, []);
 
+  // 👉 формат номера для отображения
+  const formatPhone = (val) => {
+    if (!val) return "";
+    val = val.replace(/\D/g, "");
+    if (val.length < 9) return val; // защита от обрезанных
+    if (!val.startsWith("998")) val = "998" + val.slice(-9);
+
+    let formatted = "+998";
+    if (val.length > 3) formatted += " " + val.slice(3, 5);
+    if (val.length > 5) formatted += " " + val.slice(5, 8);
+    if (val.length > 8) formatted += " " + val.slice(8, 10);
+    if (val.length > 10) formatted += " " + val.slice(10, 12);
+
+    return formatted;
+  };
+
+  // 👉 при сохранении очищаем номер
   const handleSave = async (field, newValue) => {
     if (!user) return;
 
+    let cleanValue = newValue;
+    if (field === "phone_number") {
+      cleanValue = newValue.replace(/\D/g, ""); // только цифры
+    }
+
     try {
-      const updated = await updateUser(user.id, { ...user, [field]: newValue });
+      const updated = await updateUser(user.id, { ...user, [field]: cleanValue });
       setUser(updated);
     } catch (err) {
       console.error("Ошибка при обновлении:", err);
@@ -50,7 +72,7 @@ export default function Profile() {
         />
         <ProfileField
           label="Номер телефона"
-          value={user.phone_number}
+          value={formatPhone(user.phone_number)}
           onClick={() => setEditingField("phone_number")}
         />
         <ProfileField
