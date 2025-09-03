@@ -19,12 +19,18 @@ export default function Profile() {
     fetchUser();
   }, []);
 
-  // 👉 формат номера для отображения
+  // формат номера для отображения
   const formatPhone = (val) => {
     if (!val) return "";
     val = val.replace(/\D/g, "");
-    if (val.length < 9) return val; // защита от обрезанных
-    if (!val.startsWith("998")) val = "998" + val.slice(-9);
+    if (!val.startsWith("998")) {
+      if (val.startsWith("8")) {
+        val = "998" + val.slice(1);
+      } else {
+        val = "998" + val;
+      }
+    }
+    if (val.length > 12) val = val.slice(0, 12);
 
     let formatted = "+998";
     if (val.length > 3) formatted += " " + val.slice(3, 5);
@@ -35,13 +41,21 @@ export default function Profile() {
     return formatted;
   };
 
-  // 👉 при сохранении очищаем номер
+  // при сохранении очищаем данные
   const handleSave = async (field, newValue) => {
     if (!user) return;
 
     let cleanValue = newValue;
     if (field === "phone_number") {
       cleanValue = newValue.replace(/\D/g, ""); // только цифры
+    }
+    if (field === "birth_date") {
+      // сохраняем в ISO формате YYYY-MM-DD
+      const parts = newValue.split(".");
+      if (parts.length === 3) {
+        const [dd, mm, yyyy] = parts;
+        cleanValue = `${yyyy}-${mm}-${dd}`;
+      }
     }
 
     try {

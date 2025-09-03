@@ -4,7 +4,7 @@ export default function EditModal({ isOpen, onClose, field, label, value, onSave
   const [inputValue, setInputValue] = useState(value || "");
 
   const formatPhone = (val) => {
-    val = val.replace(/\D/g, "");
+    val = val.replace(/\D/g, ""); 
     if (!val.startsWith("998")) {
       if (val.startsWith("8")) {
         val = "998" + val.slice(1);
@@ -25,7 +25,7 @@ export default function EditModal({ isOpen, onClose, field, label, value, onSave
 
   // форматирование даты
   const formatDate = (val) => {
-    val = val.replace(/\D/g, ""); // только цифры
+    val = val.replace(/\D/g, "");
     if (val.length > 8) val = val.slice(0, 8);
 
     if (val.length > 4) {
@@ -36,7 +36,7 @@ export default function EditModal({ isOpen, onClose, field, label, value, onSave
     return val;
   };
 
-  // автоформат при открытии модалки
+  // при открытии форматируем входящее значение
   useEffect(() => {
     if (field === "phone_number" && value) {
       setInputValue(formatPhone(value));
