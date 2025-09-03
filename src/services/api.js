@@ -123,37 +123,43 @@ export async function confirmOrder(orderId) {
 }
 
 
-// Получение пользователя по telegram_id
+// --- user api --- 
 export async function getUserByTelegramId(telegramId) {
   try {
-    const response = await axios.get(`${API_URL}/users/`, {
+    const res = await api.get("/users/", {
       params: { telegram_id: telegramId },
     });
-    return response.data.length > 0 ? response.data[0] : null;
-  } catch (error) {
-    console.error("Ошибка при получении пользователя:", error);
+
+    // Поддержка и без пагинации, и с пагинацией
+    if (Array.isArray(res.data)) {
+      return res.data[0] || null;
+    }
+    if (res.data.results) {
+      return res.data.results[0] || null;
+    }
+    return null;
+  } catch (err) {
+    console.error("❌ Ошибка при получении пользователя:", err);
     return null;
   }
 }
 
-// Создание нового пользователя
 export async function createUser(userData) {
   try {
-    const response = await axios.post(`${API_URL}/users/`, userData);
-    return response.data;
-  } catch (error) {
-    console.error("Ошибка при создании пользователя:", error);
-    throw error;
+    const res = await api.post("/users/", userData);
+    return res.data;
+  } catch (err) {
+    console.error("❌ Ошибка при создании пользователя:", err);
+    throw err;
   }
 }
 
-// Обновление данных пользователя
-export async function updateUser(userId, userData) {
+export async function updateUser(userId, fields) {
   try {
-    const response = await axios.put(`${API_URL}/users/${userId}/`, userData);
-    return response.data;
-  } catch (error) {
-    console.error("Ошибка при обновлении пользователя:", error);
-    throw error;
+    const res = await api.patch(`/users/${userId}/`, fields);
+    return res.data;
+  } catch (err) {
+    console.error("❌ Ошибка при обновлении пользователя:", err);
+    throw err;
   }
 }

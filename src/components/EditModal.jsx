@@ -1,15 +1,23 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function EditModal({ isOpen, onClose, field, label, value, onSave }) {
   const [inputValue, setInputValue] = useState(value || "");
 
+  useEffect(() => {
+    setInputValue(value || "");
+  }, [value, isOpen]);
+
   if (!isOpen) return null;
+
+  const modeText = value ? "Изменить" : "Указать";
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-end z-50">
       <div className="bg-white w-full rounded-t-2xl p-6 shadow-lg">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">{label}</h3>
-        
+        <h3 className="text-lg font-semibold text-gray-800 mb-4">
+          {modeText} {label.toLowerCase()}
+        </h3>
+
         <input
           type="text"
           className="w-full border border-gray-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
