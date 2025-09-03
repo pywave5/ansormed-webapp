@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 export default function EditModal({ isOpen, onClose, field, label, value, onSave }) {
   const [inputValue, setInputValue] = useState(value || "");
 
-  // чтобы при открытии модалки подтягивалось актуальное значение
   useEffect(() => {
     setInputValue(value || "");
   }, [value, isOpen]);
@@ -16,8 +15,8 @@ export default function EditModal({ isOpen, onClose, field, label, value, onSave
         <h3 className="text-lg font-semibold text-gray-800 mb-4">{label}</h3>
 
         <input
-          type="text"
-          className="w-full border border-gray-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          type={field === "birth_date" ? "date" : "text"}
+          className="w-full bg-white border border-gray-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
         />

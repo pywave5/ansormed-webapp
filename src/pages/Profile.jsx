@@ -55,8 +55,8 @@ export default function Profile() {
         />
         <ProfileField
           label="Дата рождения"
-          value={user.dob ? new Date(user.dob).toLocaleDateString("ru-RU") : ""}
-          onClick={() => setEditingField("dob")}
+          value={user.birth_date ? new Date(user.birth_date).toLocaleDateString("ru-RU") : ""}
+          onClick={() => setEditingField("birth_date")}
         />
         <ProfileField
           label="E-mail"
@@ -74,7 +74,7 @@ export default function Profile() {
             ? "Имя"
             : editingField === "phone_number"
             ? "Номер телефона"
-            : editingField === "dob"
+            : editingField === "birth_date"
             ? "Дата рождения"
             : "E-mail"
         }
@@ -93,10 +93,7 @@ function ProfileField({ label, value, onClick }) {
     >
       <span className="text-gray-700">{label}</span>
       {value ? (
-        <span className="flex items-center space-x-2">
-          <span className="text-gray-900">{value}</span>
-          <span className="text-blue-600 font-medium">Изменить</span>
-        </span>
+        <span className="text-gray-900">{value}</span>
       ) : (
         <span className="text-blue-600 font-medium">Указать</span>
       )}
