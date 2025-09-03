@@ -9,3 +9,9 @@
   -ms-overflow-style: none; /* IE и Edge */
   scrollbar-width: none; /* Firefox */
 }
+
+* {
+  user-select: none;   /* отключает выделение */
+  -webkit-user-select: none; /* для Safari */
+  -ms-user-select: none;     /* для IE/Edge старых */
+}
