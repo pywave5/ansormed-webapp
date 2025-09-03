@@ -64,7 +64,7 @@ export default function Profile() {
           className="cursor-pointer"
           onClick={() => handleEdit("dob", "Дата рождения", user.dob)}
         >
-          <span className="font-medium">Дата рождения:</span> {user.dob || "—"}
+          <span className="font-medium">Дата рождения:</span> {user.birth_date || "—"}
         </p>
         <p
           className="cursor-pointer"
