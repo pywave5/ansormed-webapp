@@ -10,24 +10,26 @@ export default function EditModal({ isOpen, onClose, field, label, value, onSave
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-end z-50">
-      <div className="bg-white w-full rounded-t-2xl p-6 shadow-lg">
+    <div
+      className="fixed inset-0 bg-black/40 flex items-end z-50"
+      onClick={onClose} // клик по фону закрывает
+    >
+      <div
+        className="bg-white w-full rounded-t-2xl p-6 shadow-lg"
+        onClick={(e) => e.stopPropagation()} // останавливаем всплытие
+      >
         <h3 className="text-lg font-semibold text-gray-800 mb-4">{label}</h3>
 
         <input
-          type={field === "birth_date" ? "date" : "text"}
-          className="w-full bg-white border border-gray-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          type={field === "birth_date" ? "text" : "text"}
+          inputMode={field === "birth_date" ? "numeric" : undefined}
+          placeholder={field === "birth_date" ? "дд.мм.гггг" : ""}
+          className="w-full bg-white border border-gray-300 rounded-xl p-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
         />
 
-        <div className="flex justify-end space-x-3 mt-4">
-          <button
-            className="px-4 py-2 rounded-xl bg-gray-200 text-gray-700"
-            onClick={onClose}
-          >
-            Отмена
-          </button>
+        <div className="flex justify-end mt-4">
           <button
             className="px-4 py-2 rounded-xl bg-blue-600 text-white"
             onClick={() => {
