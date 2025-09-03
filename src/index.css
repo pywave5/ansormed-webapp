@@ -11,7 +11,7 @@
 }
 
 * {
-  user-select: none;   /* отключает выделение */
-  -webkit-user-select: none; /* для Safari */
-  -ms-user-select: none;     /* для IE/Edge старых */
+  user-select: none;   
+  -webkit-user-select: none;
+  -ms-user-select: none;     
 }

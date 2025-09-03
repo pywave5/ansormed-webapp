@@ -121,3 +121,39 @@ export async function confirmOrder(orderId) {
   const res = await api.patch(`/orders/${orderId}/`, { status: "confirmed" });
   return res.data;
 }
+
+
+// Получение пользователя по telegram_id
+export async function getUserByTelegramId(telegramId) {
+  try {
+    const response = await axios.get(`${API_URL}/users/`, {
+      params: { telegram_id: telegramId },
+    });
+    return response.data.length > 0 ? response.data[0] : null;
+  } catch (error) {
+    console.error("Ошибка при получении пользователя:", error);
+    return null;
+  }
+}
+
+// Создание нового пользователя
+export async function createUser(userData) {
+  try {
+    const response = await axios.post(`${API_URL}/users/`, userData);
+    return response.data;
+  } catch (error) {
+    console.error("Ошибка при создании пользователя:", error);
+    throw error;
+  }
+}
+
+// Обновление данных пользователя
+export async function updateUser(userId, userData) {
+  try {
+    const response = await axios.put(`${API_URL}/users/${userId}/`, userData);
+    return response.data;
+  } catch (error) {
+    console.error("Ошибка при обновлении пользователя:", error);
+    throw error;
+  }
+}
