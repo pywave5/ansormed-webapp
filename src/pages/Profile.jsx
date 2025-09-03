@@ -6,7 +6,7 @@ import EditModal from "../components/EditModal";
 export default function Profile() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [modal, setModal] = useState({ open: false, field: null, label: "", value: "" });
+  const [editingField, setEditingField] = useState(null);
 
   useEffect(() => {
     async function fetchUser() {
@@ -19,14 +19,15 @@ export default function Profile() {
     fetchUser();
   }, []);
 
-  const handleEdit = (field, label, value) => {
-    setModal({ open: true, field, label, value });
-  };
-
-  const handleSave = async (field, value) => {
+  const handleSave = async (field, newValue) => {
     if (!user) return;
-    const updated = await updateUser(user.telegram_id, { [field]: value });
-    setUser(updated);
+
+    try {
+      const updated = await updateUser(user.id, { ...user, [field]: newValue });
+      setUser(updated);
+    } catch (err) {
+      console.error("Ошибка при обновлении:", err);
+    }
   };
 
   if (loading) {
@@ -38,54 +39,67 @@ export default function Profile() {
   }
 
   return (
-    <div className="flex flex-col space-y-4 bg-white shadow-md p-6 rounded-2xl">
-      <h2 className="text-gray-800 text-xl font-semibold">Личные данные</h2>
+    <div className="flex flex-col space-y-4">
+      <h2 className="text-center text-lg font-semibold text-gray-800">Личные данные</h2>
 
-      <div className="text-gray-700 space-y-2">
-        <p
-          className="cursor-pointer"
-          onClick={() => handleEdit("name", "Имя", user.name)}
-        >
-          <span className="font-medium">Имя:</span> {user.name || "—"}
-        </p>
-        <p
-          className="cursor-pointer"
-          onClick={() => handleEdit("phone_number", "Телефон", user.phone_number)}
-        >
-          <span className="font-medium">Телефон:</span> {user.phone_number || "—"}
-        </p>
-        <p
-          className="cursor-pointer"
-          onClick={() => handleEdit("email", "Email", user.email)}
-        >
-          <span className="font-medium">Email:</span> {user.email || "—"}
-        </p>
-        <p
-          className="cursor-pointer"
-          onClick={() => handleEdit("dob", "Дата рождения", user.dob)}
-        >
-          <span className="font-medium">Дата рождения:</span> {user.birth_date || "—"}
-        </p>
-        <p
-          className="cursor-pointer"
-          onClick={() => handleEdit("lang", "Язык", user.lang)}
-        >
-          <span className="font-medium">Язык:</span> {user.lang?.toUpperCase() || "—"}
-        </p>
-
-        <p className="text-sm text-gray-500">
-          Зарегистрирован: {new Date(user.created_at).toLocaleDateString("ru-RU")}
-        </p>
+      <div className="bg-white shadow-md rounded-2xl p-4">
+        <ProfileField
+          label="Имя"
+          value={user.name}
+          onClick={() => setEditingField("name")}
+        />
+        <ProfileField
+          label="Номер телефона"
+          value={user.phone_number}
+          onClick={() => setEditingField("phone_number")}
+        />
+        <ProfileField
+          label="Дата рождения"
+          value={user.dob ? new Date(user.dob).toLocaleDateString("ru-RU") : ""}
+          onClick={() => setEditingField("dob")}
+        />
+        <ProfileField
+          label="E-mail"
+          value={user.email}
+          onClick={() => setEditingField("email")}
+        />
       </div>
 
       <EditModal
-        isOpen={modal.open}
-        onClose={() => setModal({ open: false })}
-        field={modal.field}
-        label={modal.label}
-        value={modal.value}
+        isOpen={!!editingField}
+        onClose={() => setEditingField(null)}
+        field={editingField}
+        label={
+          editingField === "name"
+            ? "Имя"
+            : editingField === "phone_number"
+            ? "Номер телефона"
+            : editingField === "dob"
+            ? "Дата рождения"
+            : "E-mail"
+        }
+        value={user?.[editingField]}
         onSave={handleSave}
       />
+    </div>
+  );
+}
+
+function ProfileField({ label, value, onClick }) {
+  return (
+    <div
+      className="flex justify-between items-center py-3 border-b border-gray-200 cursor-pointer"
+      onClick={onClick}
+    >
+      <span className="text-gray-700">{label}</span>
+      {value ? (
+        <span className="flex items-center space-x-2">
+          <span className="text-gray-900">{value}</span>
+          <span className="text-blue-600 font-medium">Изменить</span>
+        </span>
+      ) : (
+        <span className="text-blue-600 font-medium">Указать</span>
+      )}
     </div>
   );
 }
