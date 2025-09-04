@@ -11,15 +11,15 @@ import History from "./pages/History";
 import { tg } from "./services/telegram";
 import { CartProvider } from "./context/CartContext";
 
-tg.ready();
-tg.expand();
-
 export default function App() {
   const [activePage, setActivePage] = useState("catalog");
   const [loading, setLoading] = useState(true);
   const [telegramId, setTelegramId] = useState(null);
 
   useEffect(() => {
+    tg.ready();
+    tg.expand();
+    tg.enableClosingConfirmation();
 
     if (tg.initDataUnsafe?.user?.id) {
       setTelegramId(tg.initDataUnsafe.user.id);
