@@ -3,8 +3,9 @@ import { useState, useEffect } from "react";
 export default function EditModal({ isOpen, onClose, field, label, value, onSave }) {
   const [inputValue, setInputValue] = useState(value || "");
 
+  // форматирование телефона
   const formatPhone = (val) => {
-    val = val.replace(/\D/g, ""); 
+    val = val.replace(/\D/g, "");
     if (!val.startsWith("998")) {
       if (val.startsWith("8")) {
         val = "998" + val.slice(1);
@@ -36,7 +37,7 @@ export default function EditModal({ isOpen, onClose, field, label, value, onSave
     return val;
   };
 
-  // при открытии форматируем входящее значение
+  // при открытии форматируем входное значение
   useEffect(() => {
     if (field === "phone_number" && value) {
       setInputValue(formatPhone(value));
@@ -57,41 +58,46 @@ export default function EditModal({ isOpen, onClose, field, label, value, onSave
   };
 
   return (
-    <div
-      className="fixed inset-0 h-screen w-screen bg-black/40 z-50 flex justify-center items-end"
-      onClick={onClose}
-    >
-      <div
-        className="bg-white w-full rounded-t-2xl p-6 shadow-lg"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">{label}</h3>
+    <div className="fixed inset-0 z-50">
+      {/* фон */}
+      <div className="absolute inset-0 bg-black/40" onClick={onClose}></div>
 
-        <input
-          type="text"
-          inputMode={field === "birth_date" || field === "phone_number" ? "numeric" : "text"}
-          placeholder={
-            field === "birth_date"
-              ? "дд.мм.гггг"
-              : field === "phone_number"
-              ? "+998 99 123 45 67"
-              : ""
-          }
-          className="w-full bg-white border border-gray-300 rounded-xl p-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          value={inputValue}
-          onChange={handleInputChange}
-        />
+      {/* модалка */}
+      <div className="absolute inset-x-0 bottom-0">
+        <div
+          className="bg-white w-full rounded-t-2xl p-6 shadow-lg"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">{label}</h3>
 
-        <div className="flex mt-4">
-          <button
-            className="w-full px-4 py-3 rounded-xl bg-blue-600 text-white font-medium"
-            onClick={() => {
-              onSave(field, inputValue);
-              onClose();
-            }}
-          >
-            Готово
-          </button>
+          <input
+            type="text"
+            inputMode={
+              field === "birth_date" || field === "phone_number" ? "numeric" : "text"
+            }
+            placeholder={
+              field === "birth_date"
+                ? "дд.мм.гггг"
+                : field === "phone_number"
+                ? "+998 99 123 45 67"
+                : ""
+            }
+            className="w-full bg-white border border-gray-300 rounded-xl p-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={inputValue}
+            onChange={handleInputChange}
+          />
+
+          <div className="flex mt-4">
+            <button
+              className="w-full px-4 py-3 rounded-xl bg-blue-600 text-white font-medium"
+              onClick={() => {
+                onSave(field, inputValue);
+                onClose();
+              }}
+            >
+              Готово
+            </button>
+          </div>
         </div>
       </div>
     </div>
