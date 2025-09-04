@@ -19,6 +19,7 @@ export default function App() {
   useEffect(() => {
     tg.ready();
     tg.expand();
+    tg.disableVerticalSwipes();
 
     if (tg.initDataUnsafe?.user?.id) {
       setTelegramId(tg.initDataUnsafe.user.id);
