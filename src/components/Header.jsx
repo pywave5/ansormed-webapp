@@ -10,7 +10,7 @@ export default function Header({ onSearch }) {
   };
 
   return (
-    <header className="bg-blue-600 sticky top-0 z-50 shadow-md pt-1">
+    <header className="bg-blue-600 sticky top-0 z-50 shadow-md pt-6">
       <div className="max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
         {/* Лого (текстом) */}
         <div className="flex items-center gap-2">
