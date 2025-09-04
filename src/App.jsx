@@ -39,7 +39,7 @@ export default function App() {
       phoneNumber={tg.initDataUnsafe?.user?.phone}
       customerName={tg.initDataUnsafe?.user?.first_name}
     >
-      <div className="min-h-screen bg-gray-100 pb-16">
+      <div className="min-h-screen bg-gray-100 pb-24">
         <Header />
 
         <div className="max-w-6xl mx-auto p-6 pt-40 space-y-8">
@@ -48,8 +48,6 @@ export default function App() {
           {activePage === "profile" && <Profile />}
           {activePage === "history" && <History telegramId={telegramId} />}
         </div>
-
-        <Footer />
         <BottomNav active={activePage} setActive={setActivePage} />
       </div>
     </CartProvider>
