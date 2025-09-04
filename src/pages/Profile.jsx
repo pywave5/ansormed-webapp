@@ -67,7 +67,7 @@ export default function Profile() {
       setUser(updated);
 
       haptic.success(); // подтверждение
-      showToast("✅ Ваши данные успешно изменены.");
+      showToast("Ваши данные успешно изменены.");
     } catch (err) {
       console.error("Ошибка при обновлении:", err);
       haptic.error();
