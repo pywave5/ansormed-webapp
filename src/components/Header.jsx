@@ -1,4 +1,3 @@
-Бро ты прям спасаешь, метод с тг помог!
 import { useState } from "react";
 import { Search } from "lucide-react";
 
