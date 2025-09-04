@@ -3,12 +3,14 @@ import { getUserByTelegramId, updateUser } from "../services/api";
 import { tg } from "../services/telegram";
 import EditModal from "../components/EditModal";
 import { useHaptic } from "../hooks/useHaptic";
+import { useToast } from "../hooks/useToast";
 
 export default function Profile() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [editingField, setEditingField] = useState(null);
   const haptic = useHaptic();
+  const { showToast, Toast } = useToast();
 
   useEffect(() => {
     async function fetchUser() {
@@ -47,7 +49,7 @@ export default function Profile() {
 
     let cleanValue = newValue;
     if (field === "phone_number") {
-      cleanValue = newValue.replace(/\D/g, ""); // только цифры
+      cleanValue = newValue.replace(/\D/g, "");
     }
     if (field === "birth_date") {
       const parts = newValue.split(".");
@@ -57,13 +59,19 @@ export default function Profile() {
       }
     }
 
+    // 👉 Вибрация сразу
+    haptic.light();
+
     try {
       const updated = await updateUser(user.id, { ...user, [field]: cleanValue });
       setUser(updated);
-      haptic.success(); // 👉 вибрация успеха
+
+      haptic.success(); // подтверждение
+      showToast("✅ Ваши данные успешно изменены.");
     } catch (err) {
       console.error("Ошибка при обновлении:", err);
-      haptic.error(); // 👉 вибрация ошибки
+      haptic.error();
+      showToast("❌ Ошибка при сохранении");
     }
   };
 
@@ -118,6 +126,9 @@ export default function Profile() {
         value={user?.[editingField]}
         onSave={handleSave}
       />
+
+      {/* Пуш уведомление */}
+      <Toast />
     </div>
   );
 }
