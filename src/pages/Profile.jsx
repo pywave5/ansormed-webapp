@@ -129,7 +129,7 @@ function ProfileField({ label, value, onClick }) {
     <div
       className="flex justify-between items-center py-3 border-b border-gray-200 cursor-pointer"
       onClick={() => {
-        haptic.light(); // 👉 лёгкая вибрация при открытии модалки
+        haptic.light();
         onClick();
       }}
     >

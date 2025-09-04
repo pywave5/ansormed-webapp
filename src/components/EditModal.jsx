@@ -56,8 +56,11 @@ export default function EditModal({ isOpen, onClose, field, label, value, onSave
 
   return (
     <div className="fixed inset-0 z-50">
-      <div className="absolute inset-0 bg-black/40" onClick={onClose}></div>
-      <div className="absolute inset-x-0 bottom-0">
+      {/* Штора */}
+      <div className="fixed inset-0 bg-black/40" onClick={onClose}></div>
+
+      {/* Модалка снизу */}
+      <div className="fixed inset-x-0 bottom-0">
         <div
           className="bg-white w-full rounded-t-2xl p-6 shadow-lg"
           onClick={(e) => e.stopPropagation()}
@@ -74,6 +77,8 @@ export default function EditModal({ isOpen, onClose, field, label, value, onSave
                 ? "дд.мм.гггг"
                 : field === "phone_number"
                 ? "+998 99 123 45 67"
+                : field === "email"
+                ? "example@mail.ru"
                 : ""
             }
             className="w-full bg-white border border-gray-300 rounded-xl p-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
