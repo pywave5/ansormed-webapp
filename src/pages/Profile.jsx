@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import { getUserByTelegramId, updateUser } from "../services/api";
 import { tg } from "../services/telegram";
 import EditModal from "../components/EditModal";
+import { useHaptic } from "../hooks/useHaptic";
 
 export default function Profile() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [editingField, setEditingField] = useState(null);
+  const haptic = useHaptic();
 
   useEffect(() => {
     async function fetchUser() {
@@ -19,7 +21,6 @@ export default function Profile() {
     fetchUser();
   }, []);
 
-  // формат номера для отображения
   const formatPhone = (val) => {
     if (!val) return "";
     val = val.replace(/\D/g, "");
@@ -41,7 +42,6 @@ export default function Profile() {
     return formatted;
   };
 
-  // при сохранении очищаем данные
   const handleSave = async (field, newValue) => {
     if (!user) return;
 
@@ -50,7 +50,6 @@ export default function Profile() {
       cleanValue = newValue.replace(/\D/g, ""); // только цифры
     }
     if (field === "birth_date") {
-      // сохраняем в ISO формате YYYY-MM-DD
       const parts = newValue.split(".");
       if (parts.length === 3) {
         const [dd, mm, yyyy] = parts;
@@ -61,8 +60,10 @@ export default function Profile() {
     try {
       const updated = await updateUser(user.id, { ...user, [field]: cleanValue });
       setUser(updated);
+      haptic.success(); // 👉 вибрация успеха
     } catch (err) {
       console.error("Ошибка при обновлении:", err);
+      haptic.error(); // 👉 вибрация ошибки
     }
   };
 
@@ -122,10 +123,15 @@ export default function Profile() {
 }
 
 function ProfileField({ label, value, onClick }) {
+  const haptic = useHaptic();
+
   return (
     <div
       className="flex justify-between items-center py-3 border-b border-gray-200 cursor-pointer"
-      onClick={onClick}
+      onClick={() => {
+        haptic.light(); // 👉 лёгкая вибрация при открытии модалки
+        onClick();
+      }}
     >
       <span className="text-gray-700">{label}</span>
       {value ? (
