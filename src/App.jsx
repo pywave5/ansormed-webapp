@@ -12,6 +12,7 @@ import { tg } from "./services/telegram";
 import { CartProvider } from "./context/CartContext";
 
 tg.ready();
+tg.expand();
 
 export default function App() {
   const [activePage, setActivePage] = useState("catalog");
@@ -19,9 +20,6 @@ export default function App() {
   const [telegramId, setTelegramId] = useState(null);
 
   useEffect(() => {
-    tg.expand();
-    tg.BackButton.hide();
-    tg.setHeaderColor("secondary_bg_color");
 
     if (tg.initDataUnsafe?.user?.id) {
       setTelegramId(tg.initDataUnsafe.user.id);

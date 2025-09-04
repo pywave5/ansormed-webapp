@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CheckCircle } from "lucide-react"; // ✅ иконка из lucide
+import { CheckCircle } from "lucide-react";
 
 export function useToast() {
   const [toast, setToast] = useState(null);
