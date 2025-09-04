@@ -41,7 +41,7 @@ export default function App() {
       <div className="min-h-screen bg-gray-100 pb-16">
         <Header />
 
-        <div className="max-w-6xl mx-auto p-6 pt-24 space-y-8">
+        <div className="max-w-6xl mx-auto p-6 pt-40 space-y-8">
           {activePage === "catalog" && <Catalog />}
           {activePage === "cart" && <Cart />}
           {activePage === "profile" && <Profile />}
