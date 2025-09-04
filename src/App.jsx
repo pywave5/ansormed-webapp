@@ -19,7 +19,6 @@ export default function App() {
   useEffect(() => {
     tg.ready();
     tg.expand();
-    tg.enableClosingConfirmation();
 
     if (tg.initDataUnsafe?.user?.id) {
       setTelegramId(tg.initDataUnsafe.user.id);
@@ -38,16 +37,22 @@ export default function App() {
       phoneNumber={tg.initDataUnsafe?.user?.phone}
       customerName={tg.initDataUnsafe?.user?.first_name}
     >
-      <div className="min-h-screen bg-gray-100 pb-16">
+      {/* Скроллимый контейнер */}
+      <div
+        className="h-screen flex flex-col bg-gray-100 overflow-y-auto 
+                   -webkit-overflow-scrolling-touch"
+      >
         <Header />
 
-        <div className="max-w-6xl mx-auto p-6 space-y-8">
+        {/* Контент (растягивается и скроллится) */}
+        <main className="flex-1 max-w-6xl mx-auto p-6 space-y-8">
           {activePage === "catalog" && <Catalog />}
           {activePage === "cart" && <Cart />}
           {activePage === "profile" && <Profile />}
           {activePage === "history" && <History telegramId={telegramId} />}
-        </div>
+        </main>
 
+        {/* Футер всегда снизу */}
         <BottomNav active={activePage} setActive={setActivePage} />
       </div>
     </CartProvider>
