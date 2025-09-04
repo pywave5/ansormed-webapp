@@ -15,3 +15,7 @@
   -webkit-user-select: none;
   -ms-user-select: none;     
 }
+
+html, body, #root {
+  height: 100%;
+}
