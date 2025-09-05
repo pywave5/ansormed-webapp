@@ -20,10 +20,6 @@ export default function App() {
     tg.ready();
     tg.disableVerticalSwipes();
 
-    if (tg.platform.includes("desktop")) {
-    setIsDesktop(true);
-    }
-
     if (tg.platform === "android" || tg.platform === "ios") {
       tg.expand();
       tg.requestFullscreen?.();
