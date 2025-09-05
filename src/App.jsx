@@ -45,17 +45,14 @@ export default function App() {
       customerName={tg.initDataUnsafe?.user?.first_name}
     >
       <div className="min-h-screen bg-gray-100 pb-24">
-        <header className="w-full fixed top-0 left-0 z-50 shadow-md bg-white">
-          <Header />
-        </header>
-        <main className="max-w-6xl mx-auto p-6 pt-24 space-y-8">
+        <Header />
+
+        <div className="max-w-6xl mx-auto p-6 pt-40 space-y-8">
           {activePage === "catalog" && <Catalog />}
           {activePage === "cart" && <Cart />}
           {activePage === "profile" && <Profile />}
           {activePage === "history" && <History telegramId={telegramId} />}
-        </main>
-
-        {/* Нижняя навигация */}
+        </div>
         <BottomNav active={activePage} setActive={setActivePage} />
       </div>
     </CartProvider>
