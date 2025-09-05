@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import Header from "./components/Header";
-import Footer from "./components/Footer";
 import BottomNav from "./components/BottomNav";
 import SplashScreen from "./components/SplashScreen";
 
@@ -19,7 +18,7 @@ export default function App() {
 
   useEffect(() => {
     tg.ready();
-    tg.expand();
+    // tg.expand();
     tg.disableVerticalSwipes();
 
     if (tg.initDataUnsafe?.user?.id) {
