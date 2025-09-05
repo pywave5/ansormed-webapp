@@ -22,6 +22,9 @@ export default function App() {
 
     if (tg.platform === "android" || tg.platform === "ios") {
       tg.expand();
+      tg.requestFullscreen?.();
+    } else {
+      tg.exitFullscreen?.();
     }
 
     if (tg.initDataUnsafe?.user?.id) {
