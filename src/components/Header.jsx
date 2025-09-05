@@ -10,9 +10,8 @@ export default function Header({ onSearch }) {
   };
 
   return (
-    <header className="bg-blue-600 fixed top-0 z-50 shadow-md">
+    <header className="bg-blue-600 fixed top-0 left-0 w-full z-50 shadow-md">
       <div className="max-w-6xl mx-auto flex items-center justify-between px-4 py-3 pt-24">
-        {/* Лого (текстом) */}
         <div className="flex items-center gap-2">
           <span className="text-white font-bold text-xl tracking-wide">
             ansormed
