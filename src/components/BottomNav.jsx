@@ -1,19 +1,18 @@
 import { ShoppingCart, User, Grid, Clock } from "lucide-react";
-import { useCart } from "../context/CartContext";
+import { useCart } from "../hooks/useCart"; // ✅ теперь берём из hooks
 import { useHaptic } from "../hooks/useHaptic";
 
 export default function BottomNav({ active, setActive }) {
-  const { cart } = useCart() || {};
+  const { data: cart } = useCart(); // ✅ cart теперь берём через React Query
   const { tap } = useHaptic();
 
-  // защитно: если корзины еще нет, считаем totalCount = 0
   const totalCount = (cart?.items || []).reduce(
     (acc, item) => acc + (item.quantity || 1),
     0
   );
 
   const handleClick = (menu) => {
-    tap(); // вибрация при переходе
+    tap();
     setActive(menu);
   };
 
