@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Categories from "./Categories";
 import Products from "./Products";
+import AdsCarousel from "@/components/AdsCarousel"; // импорт рекламы
 import { searchProducts } from "../services/api";
 
 export default function Catalog() {
@@ -27,10 +28,14 @@ export default function Catalog() {
         <Products categoryId={null} productsOverride={searchResults} />
       ) : (
         <>
-          <Categories 
-            onSelect={setSelectedCategory} 
-            selectedId={selectedCategory} 
+          <Categories
+            onSelect={setSelectedCategory}
+            selectedId={selectedCategory}
           />
+
+          {/* Реклама: показываем под категориями */}
+          <AdsCarousel />
+
           <Products categoryId={selectedCategory} />
         </>
       )}

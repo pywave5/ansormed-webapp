@@ -163,3 +163,21 @@ export async function updateUser(userId, fields) {
     throw err;
   }
 }
+
+// --- реклама ---
+export async function getAds() {
+  try {
+    const res = await api.get("/ads/");
+    // поддержка и без пагинации, и с пагинацией
+    if (Array.isArray(res.data)) {
+      return res.data;
+    }
+    if (res.data.results) {
+      return res.data.results;
+    }
+    return [];
+  } catch (err) {
+    console.error("❌ Ошибка при загрузке рекламы:", err);
+    return [];
+  }
+}
