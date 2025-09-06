@@ -13,8 +13,7 @@ export default function Categories({ onSelect, selectedId }) {
       .then((cats) => {
         setCategories(cats);
         if (cats.length > 0 && selectedId === null) {
-          // 👉 сразу выбираем первую категорию
-          onSelect(cats[0].id);
+          onSelect(cats[0].id); // 👉 сразу выбрать первую категорию
         }
       })
       .catch((err) => console.error("Ошибка категорий:", err));
@@ -45,7 +44,7 @@ export default function Categories({ onSelect, selectedId }) {
   };
 
   return (
-    <div>
+    <div className="sticky top-0 bg-white z-10 pb-2">
       <h2 className="text-xl font-bold mb-3">Категории</h2>
       <div
         ref={scrollContainerRef}
@@ -55,9 +54,7 @@ export default function Categories({ onSelect, selectedId }) {
           <button
             key={c.id}
             ref={(el) => {
-              if (el) {
-                buttonRefs.current[c.id] = el;
-              }
+              if (el) buttonRefs.current[c.id] = el;
             }}
             onClick={() => handleSelect(c.id)}
             className={`whitespace-nowrap px-4 py-2 rounded-full border transition flex-shrink-0

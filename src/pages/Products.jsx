@@ -22,7 +22,7 @@ export default function Products({ selectedId, onCategoryChange }) {
 
   // Загружаем товары при изменении категории или страницы
   useEffect(() => {
-    if (selectedId === null) return; // ✅ важно: только null блокирует загрузку
+    if (selectedId === null) return;
 
     const load = async () => {
       try {
@@ -50,7 +50,7 @@ export default function Products({ selectedId, onCategoryChange }) {
           if (page < totalPages) {
             setPage((p) => p + 1);
           } else {
-            // если страниц больше нет → идём к следующей категории
+            // 👉 переключение категории в интерфейсе
             const currentIndex = categories.findIndex(
               (c) => c.id === selectedId
             );
@@ -81,15 +81,16 @@ export default function Products({ selectedId, onCategoryChange }) {
     setSelectedProduct(product);
   };
 
+  const currentCategory = categories.find((c) => c.id === selectedId);
+
   return (
     <div>
-      <h2 className="text-xl font-bold mb-3">Товары</h2>
-
-      {/* 👇 отладка прямо в интерфейсе */}
-      <div className="text-xs text-gray-400 mb-4">
-        Категория: {selectedId ?? "—"} | Страница: {page}/{totalPages} | Загружено товаров:{" "}
-        {products.length}
-      </div>
+      {/* название текущей категории */}
+      {currentCategory && (
+        <h2 className="text-lg font-semibold mb-3 mt-4">
+          {currentCategory.name}
+        </h2>
+      )}
 
       {products.length === 0 ? (
         <p className="text-gray-500">Нет товаров</p>
