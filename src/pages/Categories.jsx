@@ -13,13 +13,12 @@ export default function Categories({ onSelect, selectedId }) {
       .then((cats) => {
         setCategories(cats);
         if (cats.length > 0 && selectedId === null) {
-          onSelect(cats[0].id); // 👉 сразу выбрать первую категорию
+          onSelect(cats[0].id);
         }
       })
       .catch((err) => console.error("Ошибка категорий:", err));
   }, [onSelect, selectedId]);
 
-  // Скролл к выбранной категории
   useEffect(() => {
     if (selectedId !== null && buttonRefs.current[selectedId]) {
       const element = buttonRefs.current[selectedId];
@@ -45,7 +44,6 @@ export default function Categories({ onSelect, selectedId }) {
 
   return (
     <div className="sticky top-0 bg-white z-10 pb-2">
-      <h2 className="text-xl font-bold mb-3">Категории</h2>
       <div
         ref={scrollContainerRef}
         className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide scroll-smooth"
