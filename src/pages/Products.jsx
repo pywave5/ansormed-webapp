@@ -83,6 +83,11 @@ export default function Products({ selectedId, onCategoryChange }) {
     <div>
       <h2 className="text-xl font-bold mb-3">Товары</h2>
 
+      {/* 👇 Блок отладки */}
+      <div className="text-xs text-gray-400 mb-4">
+        Категория: {selectedId || "—"} | Страница: {page} / {totalPages}
+      </div>
+
       {products.length === 0 ? (
         <p className="text-gray-500">Нет товаров</p>
       ) : (
