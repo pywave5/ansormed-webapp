@@ -39,7 +39,7 @@ export default function AdsCarousel() {
         spaceBetween={16}
         slidesPerView={1}
         centeredSlides={true}
-        grabCursor={true} // чтобы можно было тянуть мышкой
+        grabCursor={true}
       >
         {ads.map((ad) => (
           <SwiperSlide key={ad.id}>
@@ -47,7 +47,7 @@ export default function AdsCarousel() {
               <img
                 src={ad.image}
                 alt=""
-                className="w-full h-[50px] object-cover"
+                className="w-full h-[70px] object-cover"
               />
             </div>
           </SwiperSlide>
