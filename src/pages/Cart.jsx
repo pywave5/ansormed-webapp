@@ -33,11 +33,6 @@ export default function Cart() {
     );
   }
 
-  const total = cart.items.reduce(
-    (sum, item) => sum + item.product.price * (item.quantity || 1),
-    0
-  );
-
   return (
     <div className="p-4 max-w-2xl mx-auto">
       <h1 className="text-xl sm:text-2xl mb-4 font-bold text-gray-900">Корзина</h1>
@@ -61,13 +56,19 @@ export default function Cart() {
                 {item.product.title}
               </p>
               <p className="text-xs sm:text-sm text-gray-700">
-                {item.quantity || 1} шт × {item.product.price.toLocaleString()} сум
+                {item.quantity || 1} шт ×{" "}
+                {item.product.final_price.toLocaleString()} сум
+                {item.product.discount > 0 && (
+                  <span className="line-through ml-2 text-gray-400">
+                    {item.product.price.toLocaleString()} сум
+                  </span>
+                )}
               </p>
             </div>
 
             <div className="flex flex-col items-end gap-2 sm:flex-row sm:items-center sm:gap-3 flex-shrink-0">
               <p className="font-bold text-green-600 text-sm sm:text-base whitespace-nowrap">
-                {(item.quantity * item.product.price).toLocaleString()} сум
+                {item.total_price.toLocaleString()} сум
               </p>
               <button
                 onClick={() => {
@@ -85,7 +86,7 @@ export default function Cart() {
 
       <div className="mt-6 flex justify-between font-bold text-base sm:text-lg text-gray-900 bg-gray-100 rounded-xl p-3">
         <span>Итого:</span>
-        <span>{total.toLocaleString()} сум</span>
+        <span>{cart.total_cost.toLocaleString()} сум</span>
       </div>
 
       <button
