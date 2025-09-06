@@ -12,15 +12,15 @@ export default function Categories({ onSelect, selectedId }) {
     getCategories()
       .then((cats) => {
         setCategories(cats);
-        if (cats.length > 0 && !selectedId) {
-          // сразу выбираем первую категорию
+        // 👉 выбираем первую категорию по умолчанию
+        if (cats.length > 0 && selectedId === null) {
           onSelect(cats[0].id);
         }
       })
       .catch((err) => console.error("Ошибка категорий:", err));
   }, []);
 
-  // Скролл к выбранной категории
+  // автоскролл к выбранной
   useEffect(() => {
     if (selectedId !== null && buttonRefs.current[selectedId]) {
       const element = buttonRefs.current[selectedId];
@@ -41,7 +41,7 @@ export default function Categories({ onSelect, selectedId }) {
 
   const handleSelect = (id) => {
     light();
-    onSelect(id);
+    onSelect(id); // 👉 передаём именно id
   };
 
   return (
@@ -59,7 +59,7 @@ export default function Categories({ onSelect, selectedId }) {
                 buttonRefs.current[c.id] = el;
               }
             }}
-            onClick={() => handleSelect(c.id)}
+            onClick={() => handleSelect(c.id)} // 👉 тут только id
             className={`whitespace-nowrap px-4 py-2 rounded-full border transition flex-shrink-0
               ${
                 selectedId === c.id
