@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { Plus, Minus } from "lucide-react";
-import { useCart } from "../context/CartContext";
+import { useCart } from "../hooks/useCart"; // ✅ новый хук
 import { useHaptic } from "../hooks/useHaptic";
 
 export default function ProductModal({ product, onClose }) {
   const [quantity, setQuantity] = useState(1);
-  const { addToCart } = useCart();
-  const { light, success, warning } = useHaptic(); // 👈 новый хук
+  const { addToCart } = useCart(); // ✅ берём из React Query
+  const { light, success, warning } = useHaptic();
 
   useEffect(() => {
     const handleEsc = (e) => {
@@ -26,15 +26,15 @@ export default function ProductModal({ product, onClose }) {
     }
     if (val > 10000) {
       setQuantity(10000);
-      warning(); // вибрация при превышении лимита
+      warning();
       return;
     }
     setQuantity(val);
   };
 
   const handleAddToCart = () => {
-    addToCart(product, quantity);
-    success(); // вибрация успеха при добавлении
+    addToCart(product, quantity); // 🚀 напрямую вызываем mutation
+    success();
     onClose();
   };
 
@@ -74,9 +74,14 @@ export default function ProductModal({ product, onClose }) {
           {product.title}
         </h2>
 
-        {/* Цена */}
+        {/* Цена со скидкой */}
         <p className="text-green-600 font-semibold mb-3">
-          {product.price.toLocaleString()} сум
+          {product.final_price.toLocaleString()} сум
+          {product.discount > 0 && (
+            <span className="line-through ml-2 text-gray-400">
+              {product.price.toLocaleString()} сум
+            </span>
+          )}
         </p>
 
         {/* Описание */}
@@ -101,13 +106,10 @@ export default function ProductModal({ product, onClose }) {
             value={quantity}
             onChange={(e) => {
               const value = e.target.value;
-
-              // разрешаем временно пустое поле
               if (value === "") {
                 setQuantity("");
                 return;
               }
-
               const val = Number(value);
               if (!isNaN(val)) {
                 handleQuantityChange(val);
@@ -116,10 +118,10 @@ export default function ProductModal({ product, onClose }) {
             onBlur={() => {
               if (!quantity || quantity < 1) {
                 setQuantity(1);
-                warning(); // вибрация предупреждения
+                warning();
               } else if (quantity > 10000) {
                 setQuantity(10000);
-                warning(); // вибрация предупреждения при превышении лимита
+                warning();
               }
             }}
             className="input input-bordered w-20 text-center"
