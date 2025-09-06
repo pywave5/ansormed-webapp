@@ -1,12 +1,22 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Categories from "./Categories";
 import Products from "./Products";
 import AdsCarousel from "../components/AdsCarousel";
-import { searchProducts } from "../services/api";
+import { searchProducts, getCategories } from "../services/api";
 
 export default function Catalog() {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchResults, setSearchResults] = useState(null);
+
+  useEffect(() => {
+    getCategories()
+      .then((data) => {
+        if (data.length > 0) {
+          setSelectedCategory(data[0].id);
+        }
+      })
+      .catch((err) => console.error("Ошибка категорий:", err));
+  }, []);
 
   const handleSearch = async (query) => {
     if (!query.trim()) {
@@ -23,7 +33,6 @@ export default function Catalog() {
 
   return (
     <div>
-      {/* если есть поиск — показываем только результаты */}
       {searchResults ? (
         <Products categoryId={null} productsOverride={searchResults} />
       ) : (
@@ -33,10 +42,11 @@ export default function Catalog() {
             selectedId={selectedCategory}
           />
 
-          {/* Реклама: показываем под категориями */}
           <AdsCarousel />
 
-          <Products categoryId={selectedCategory} />
+          {selectedCategory && (
+            <Products categoryId={selectedCategory} />
+          )}
         </>
       )}
     </div>
