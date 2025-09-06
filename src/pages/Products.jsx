@@ -1,26 +1,30 @@
 import { useEffect, useState } from "react";
-import { getProducts } from "../services/api";
+import { getProducts, getCategories } from "../services/api";
 import ProductModal from "../components/ProductModal";
-import { useHaptic } from "../hooks/useHaptic"; // 👈 импортируем
+import { useHaptic } from "../hooks/useHaptic";
 
-export default function Products({ categoryId, productsOverride }) {
+export default function Products({ selectedId, onCategoryChange }) {
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
+  const [categories, setCategories] = useState([]);
   const { tap } = useHaptic();
 
+  // Загружаем список категорий
   useEffect(() => {
-    if (productsOverride) {
-      setProducts(productsOverride);
-      return;
-    }
+    getCategories().then(setCategories).catch(console.error);
+  }, []);
+
+  // Загружаем товары
+  useEffect(() => {
+    if (!selectedId) return;
 
     const load = async () => {
       try {
-        const data = await getProducts(categoryId, page);
+        const data = await getProducts(selectedId, page);
         setProducts(data.results || []);
         setTotalPages(data.total_pages || 1);
       } catch (err) {
@@ -29,10 +33,22 @@ export default function Products({ categoryId, productsOverride }) {
     };
 
     load();
-  }, [categoryId, productsOverride, page]);
+  }, [selectedId, page]);
+
+  // Проверяем, если страница кончилась → переключаем категорию
+  useEffect(() => {
+    if (page > totalPages && categories.length > 0) {
+      const currentIndex = categories.findIndex((c) => c.id === selectedId);
+      const nextCategory = categories[currentIndex + 1];
+      if (nextCategory) {
+        onCategoryChange(nextCategory.id); // переключаем категорию
+        setPage(1);
+      }
+    }
+  }, [page, totalPages, categories, selectedId, onCategoryChange]);
 
   const handleSelectProduct = (product) => {
-    tap(); // 👈 вибрация при выборе товара
+    tap();
     setSelectedProduct(product);
   };
 
@@ -47,7 +63,7 @@ export default function Products({ categoryId, productsOverride }) {
             {products.map((p) => (
               <div
                 key={p.id}
-                onClick={() => handleSelectProduct(p)} // 👈 вызываем вибрацию
+                onClick={() => handleSelectProduct(p)}
                 className="bg-white rounded-xl shadow-md hover:shadow-xl transition cursor-pointer overflow-hidden relative"
               >
                 {p.discount > 0 && (
@@ -91,66 +107,23 @@ export default function Products({ categoryId, productsOverride }) {
             ))}
           </div>
 
-          {/* Пагинация */}
-          <div className="flex justify-center items-center gap-2 mt-6 flex-wrap">
-            <button
-              className="btn btn-sm"
-              disabled={page === 1}
-              onClick={() => {
-                tap(); // вибрация
-                setPage((p) => p - 1);
-              }}
-            >
-              Назад
-            </button>
-
-            {(() => {
-              let pagesToShow = [];
-
-              if (totalPages <= 3) {
-                // если всего 3 или меньше страниц — показываем все
-                pagesToShow = Array.from({ length: totalPages }, (_, i) => i + 1);
-              } else if (page === 1) {
-                pagesToShow = [1, 2, 3];
-              } else if (page === totalPages) {
-                pagesToShow = [totalPages - 2, totalPages - 1, totalPages];
-              } else {
-                pagesToShow = [page - 1, page, page + 1];
-              }
-
-              return pagesToShow.map((num) => (
-                <button
-                  key={num}
-                  onClick={() => {
-                    tap(); // вибрация
-                    setPage(num);
-                  }}
-                  className={`btn btn-sm ${
-                    num === page
-                      ? "btn-primary"
-                      : "btn-outline text-gray-600 border-gray-300"
-                  }`}
-                >
-                  {num}
-                </button>
-              ));
-            })()}
-
-            <button
-              className="btn btn-sm"
-              disabled={page === totalPages}
-              onClick={() => {
-                tap(); // вибрация
-                setPage((p) => p + 1);
-              }}
-            >
-              Вперёд
-            </button>
-          </div>
+          {/* Вместо кнопок пагинации → "загрузить ещё" */}
+          {page < totalPages && (
+            <div className="flex justify-center mt-6">
+              <button
+                className="btn btn-primary"
+                onClick={() => {
+                  tap();
+                  setPage((p) => p + 1);
+                }}
+              >
+                Показать ещё
+              </button>
+            </div>
+          )}
         </>
       )}
 
-      {/* Модалка */}
       {selectedProduct && (
         <ProductModal
           product={selectedProduct}
