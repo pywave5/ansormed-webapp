@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getAds } from "@/services/api";
+import { getAds } from "../services/api";
 
 export default function AdsCarousel() {
   const [ads, setAds] = useState([]);
