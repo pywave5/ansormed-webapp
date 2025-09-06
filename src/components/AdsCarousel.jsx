@@ -5,9 +5,19 @@ export default function AdsCarousel() {
   const [ads, setAds] = useState([]);
 
   useEffect(() => {
-    getAds().then(setAds).catch((err) => {
-      console.error("Ошибка загрузки рекламы:", err);
-    });
+    getAds()
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setAds(data);
+        } else if (data?.results) {
+          setAds(data.results);
+        } else {
+          setAds([]);
+        }
+      })
+      .catch((err) => {
+        console.error("Ошибка загрузки рекламы:", err);
+      });
   }, []);
 
   if (!ads || ads.length === 0) return null;
