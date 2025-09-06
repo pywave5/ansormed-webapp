@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { getProducts, getCategories } from "../services/api";
 import ProductModal from "../components/ProductModal";
 import { useHaptic } from "../hooks/useHaptic";
@@ -11,24 +11,25 @@ export default function Products({ selectedId, onCategoryChange }) {
   const [totalPages, setTotalPages] = useState(1);
 
   const [categories, setCategories] = useState([]);
+  const loaderRef = useRef(null);
+
   const { tap } = useHaptic();
 
-  // Загружаем список категорий
+  // Загружаем категории (чтобы знать следующую)
   useEffect(() => {
     getCategories().then(setCategories).catch(console.error);
   }, []);
 
-  // Загружаем товары
+  // Загружаем товары при изменении категории или страницы
   useEffect(() => {
     if (!selectedId) return;
 
     const load = async () => {
       try {
         const data = await getProducts(selectedId, page);
-
         const newProducts = data.results || [];
 
-        setProducts(prev =>
+        setProducts((prev) =>
           page === 1 ? newProducts : [...prev, ...newProducts]
         );
 
@@ -41,16 +42,36 @@ export default function Products({ selectedId, onCategoryChange }) {
     load();
   }, [selectedId, page]);
 
-  // Проверяем, если страница кончилась → переключаем категорию
+  // Автоподгрузка при скролле вниз
   useEffect(() => {
-    if (page > totalPages && categories.length > 0) {
-      const currentIndex = categories.findIndex((c) => c.id === selectedId);
-      const nextCategory = categories[currentIndex + 1];
-      if (nextCategory) {
-        onCategoryChange(nextCategory.id); // переключаем категорию
-        setPage(1);
-      }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          if (page < totalPages) {
+            setPage((p) => p + 1);
+          } else {
+            // если страниц больше нет → идём к следующей категории
+            const currentIndex = categories.findIndex((c) => c.id === selectedId);
+            const nextCategory = categories[currentIndex + 1];
+            if (nextCategory) {
+              onCategoryChange(nextCategory.id);
+              setPage(1);
+            }
+          }
+        }
+      },
+      { threshold: 1 }
+    );
+
+    if (loaderRef.current) {
+      observer.observe(loaderRef.current);
     }
+
+    return () => {
+      if (loaderRef.current) {
+        observer.unobserve(loaderRef.current);
+      }
+    };
   }, [page, totalPages, categories, selectedId, onCategoryChange]);
 
   const handleSelectProduct = (product) => {
@@ -61,6 +82,7 @@ export default function Products({ selectedId, onCategoryChange }) {
   return (
     <div>
       <h2 className="text-xl font-bold mb-3">Товары</h2>
+
       {products.length === 0 ? (
         <p className="text-gray-500">Нет товаров</p>
       ) : (
@@ -113,20 +135,8 @@ export default function Products({ selectedId, onCategoryChange }) {
             ))}
           </div>
 
-          {/* Вместо кнопок пагинации → "загрузить ещё" */}
-          {page < totalPages && (
-            <div className="flex justify-center mt-6">
-              <button
-                className="btn btn-primary"
-                onClick={() => {
-                  tap();
-                  setPage((p) => p + 1);
-                }}
-              >
-                Показать ещё
-              </button>
-            </div>
-          )}
+          {/* Невидимый "триггер" для подгрузки */}
+          <div ref={loaderRef} className="h-10"></div>
         </>
       )}
 
