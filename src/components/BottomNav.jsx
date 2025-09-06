@@ -1,18 +1,13 @@
 import { ShoppingCart, User, Grid, Clock } from "lucide-react";
-import { useCart } from "../hooks/useCart"; // ✅ теперь берём из hooks
+import { useCart } from "../hooks/useCart";
 import { useHaptic } from "../hooks/useHaptic";
 
 export default function BottomNav({ active, setActive }) {
-  const { data: cart } = useCart(); // ✅ cart теперь берём через React Query
+  const { totalItems } = useCart(); // ✅ берём сразу общее количество товаров
   const { tap } = useHaptic();
 
-  const totalCount = (cart?.items || []).reduce(
-    (acc, item) => acc + (item.quantity || 1),
-    0
-  );
-
   const handleClick = (menu) => {
-    tap();
+    tap(); // вибрация при переходе
     setActive(menu);
   };
 
@@ -37,9 +32,9 @@ export default function BottomNav({ active, setActive }) {
         }`}
       >
         <ShoppingCart size={24} />
-        {totalCount > 0 && (
+        {totalItems > 0 && (
           <span className="absolute -top-1 -right-2 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full">
-            {totalCount}
+            {totalItems}
           </span>
         )}
         <span className="text-xs mt-1">Корзина</span>
