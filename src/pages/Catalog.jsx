@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Categories from "./Categories";
 import Products from "./Products";
-import AdsCarousel from "@/components/AdsCarousel"; // импорт рекламы
+import AdsCarousel from "../components/AdsCarousel";
 import { searchProducts } from "../services/api";
 
 export default function Catalog() {
