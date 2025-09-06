@@ -26,12 +26,11 @@ export default function Products({ selectedId, onCategoryChange }) {
       try {
         const data = await getProducts(selectedId, page);
 
-        // Проверяем разные варианты структуры ответа
-        const newProducts = Array.isArray(data) 
-          ? data 
-          : (data.results || []);
+        const newProducts = data.results || [];
 
-        setProducts(prev => page === 1 ? newProducts : [...prev, ...newProducts]);
+        setProducts(prev =>
+          page === 1 ? newProducts : [...prev, ...newProducts]
+        );
 
         setTotalPages(data.total_pages || 1);
       } catch (err) {
