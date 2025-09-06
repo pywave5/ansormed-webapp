@@ -1,21 +1,13 @@
-import { useCart } from "../context/CartContext";
+import { useCart } from "../hooks/useCart";
 import { Trash2 } from "lucide-react";
 import emptyCart from "../media/empty-cart.png";
 import { useHaptic } from "../hooks/useHaptic";
 
 export default function Cart() {
-  const { cart, removeFromCart, clearCart, checkout, loading } = useCart();
+  const { cart, removeFromCart, clearCart } = useCart();
   const { tap } = useHaptic();
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[70vh] text-gray-700">
-        <p className="text-lg font-semibold">Загрузка корзины...</p>
-      </div>
-    );
-  }
-
-  if (!cart || !cart.items || cart.items.length === 0) {
+  if (!cart || cart.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[70vh] text-gray-700 p-4">
         <img
@@ -33,36 +25,41 @@ export default function Cart() {
     );
   }
 
+  const totalCost = cart.reduce(
+    (sum, item) => sum + item.quantity * (item.final_price || 0),
+    0
+  );
+
   return (
     <div className="p-4 max-w-2xl mx-auto">
       <h1 className="text-xl sm:text-2xl mb-4 font-bold text-gray-900">Корзина</h1>
 
       <ul className="space-y-3">
-        {cart.items.map((item) => (
+        {cart.map((item) => (
           <li
             key={item.id}
             className="flex items-center gap-3 bg-white border rounded-xl p-3 shadow-sm"
           >
-            {item.product?.image && (
+            {item.image && (
               <img
-                src={item.product.image}
-                alt={item.product.title || "Товар"}
+                src={item.image}
+                alt={item.title || "Товар"}
                 className="w-14 h-14 sm:w-16 sm:h-16 object-cover rounded-lg border flex-shrink-0"
               />
             )}
 
             <div className="flex-1 min-w-0">
               <p className="font-semibold text-gray-900 text-sm sm:text-base truncate">
-                {item.product?.title || "Без названия"}
+                {item.title || "Без названия"}
               </p>
               <p className="text-xs sm:text-sm text-gray-700">
                 {item.quantity || 1} шт ×{" "}
-                {item.product?.final_price
-                  ? item.product.final_price.toLocaleString() + " сум"
+                {item.final_price
+                  ? item.final_price.toLocaleString() + " сум"
                   : "—"}
-                {item.product?.discount > 0 && item.product?.price && (
+                {item.discount > 0 && item.price && (
                   <span className="line-through ml-2 text-gray-400">
-                    {item.product.price.toLocaleString()} сум
+                    {item.price.toLocaleString()} сум
                   </span>
                 )}
               </p>
@@ -70,9 +67,7 @@ export default function Cart() {
 
             <div className="flex flex-col items-end gap-2 sm:flex-row sm:items-center sm:gap-3 flex-shrink-0">
               <p className="font-bold text-green-600 text-sm sm:text-base whitespace-nowrap">
-                {item.total_price
-                  ? item.total_price.toLocaleString() + " сум"
-                  : "—"}
+                {(item.quantity * (item.final_price || 0)).toLocaleString()} сум
               </p>
               <button
                 onClick={() => {
@@ -90,13 +85,13 @@ export default function Cart() {
 
       <div className="mt-6 flex justify-between font-bold text-base sm:text-lg text-gray-900 bg-gray-100 rounded-xl p-3">
         <span>Итого:</span>
-        <span>{cart.total_cost ? cart.total_cost.toLocaleString() : 0} сум</span>
+        <span>{totalCost.toLocaleString()} сум</span>
       </div>
 
       <button
-        onClick={async () => {
+        onClick={() => {
           tap();
-          await checkout();
+          clearCart();
         }}
         className="mt-6 w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition text-sm sm:text-base"
       >

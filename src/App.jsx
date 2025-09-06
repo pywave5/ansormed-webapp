@@ -9,7 +9,11 @@ import Profile from "./pages/Profile";
 import History from "./pages/History";
 
 import { tg } from "./services/telegram";
-import { CartProvider } from "./context/CartContext";
+
+// импортируем react-query
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
 
 export default function App() {
   const [activePage, setActivePage] = useState("catalog");
@@ -38,12 +42,7 @@ export default function App() {
   if (loading) return <SplashScreen />;
 
   return (
-    <CartProvider
-      telegramId={telegramId}
-      username={tg.initDataUnsafe?.user?.username}
-      phoneNumber={tg.initDataUnsafe?.user?.phone}
-      customerName={tg.initDataUnsafe?.user?.first_name}
-    >
+    <QueryClientProvider client={queryClient}>
       <div className="min-h-screen bg-gray-100 pb-24">
         <Header />
 
@@ -55,6 +54,6 @@ export default function App() {
         </div>
         <BottomNav active={activePage} setActive={setActivePage} />
       </div>
-    </CartProvider>
+    </QueryClientProvider>
   );
 }
