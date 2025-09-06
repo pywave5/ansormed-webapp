@@ -48,8 +48,14 @@ export default function Products({ categoryId, productsOverride }) {
               <div
                 key={p.id}
                 onClick={() => handleSelectProduct(p)} // 👈 вызываем вибрацию
-                className="bg-white rounded-xl shadow-md hover:shadow-xl transition cursor-pointer overflow-hidden"
+                className="bg-white rounded-xl shadow-md hover:shadow-xl transition cursor-pointer overflow-hidden relative"
               >
+                {p.discount > 0 && (
+                  <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow">
+                    -{p.discount}%
+                  </span>
+                )}
+
                 {p.image && (
                   <figure className="bg-gray-50 flex justify-center">
                     <img
@@ -63,9 +69,23 @@ export default function Products({ categoryId, productsOverride }) {
                   <h3 className="font-medium text-gray-900 text-sm truncate">
                     {p.title}
                   </h3>
-                  <span className="font-bold text-green-600 text-sm block mt-1">
-                    {p.price.toLocaleString()} сум
-                  </span>
+
+                  <div className="mt-1">
+                    {p.discount > 0 ? (
+                      <>
+                        <span className="text-gray-400 line-through text-xs block">
+                          {p.price.toLocaleString()} сум
+                        </span>
+                        <span className="font-bold text-red-600 text-sm block">
+                          {p.final_price.toLocaleString()} сум
+                        </span>
+                      </>
+                    ) : (
+                      <span className="font-bold text-green-600 text-sm block">
+                        {p.price.toLocaleString()} сум
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
