@@ -47,7 +47,7 @@ export default function AdsCarousel() {
               <img
                 src={ad.image}
                 alt=""
-                className="w-full h-[70px] object-cover"
+                className="w-full h-[90px] object-cover"
               />
             </div>
           </SwiperSlide>
