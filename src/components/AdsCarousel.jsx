@@ -5,10 +5,8 @@ export default function AdsCarousel() {
   const [ads, setAds] = useState([]);
 
   useEffect(() => {
-    getAds().then((data) => {
-      if (Array.isArray(data.results)) {
-        setAds(data.results);
-      }
+    getAds().then(setAds).catch((err) => {
+      console.error("Ошибка загрузки рекламы:", err);
     });
   }, []);
 
