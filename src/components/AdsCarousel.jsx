@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getAds } from "../services/api";
 
+// Swiper
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
 import "swiper/css";
@@ -30,14 +31,15 @@ export default function AdsCarousel() {
     <div className="my-4 px-2">
       <Swiper
         modules={[Autoplay]}
-        loop={true}
+        loop={true} // 🔁 бесконечный цикл
         autoplay={{
-          delay: 3000,
-          disableOnInteraction: false,
+          delay: 3000, // смена каждые 3 секунды
+          disableOnInteraction: false, // автоплей не останавливается при свайпе
         }}
         spaceBetween={16}
-        slidesPerView={1.2}
+        slidesPerView={1}
         centeredSlides={true}
+        grabCursor={true} // чтобы можно было тянуть мышкой
       >
         {ads.map((ad) => (
           <SwiperSlide key={ad.id}>
