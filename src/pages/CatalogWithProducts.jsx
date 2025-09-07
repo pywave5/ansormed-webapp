@@ -61,7 +61,7 @@ export default function CatalogWithProducts() {
   return (
     <div>
       {/* Категории фиксированы */}
-      <div className="sticky top-0 z-10 bg-white shadow-sm overflow-x-auto">
+      <div className="sticky top-20 z-10 bg-white shadow-sm overflow-x-auto">
         <div className="flex space-x-3 p-3">
           {categories.map((cat) => (
             <button
@@ -69,7 +69,7 @@ export default function CatalogWithProducts() {
               onClick={() => handleCategoryClick(cat.id)}
               className={`px-4 py-2 rounded-full whitespace-nowrap ${
                 activeCategory === cat.id
-                  ? "bg-green-600 text-white"
+                  ? "bg-blue-600 text-white"
                   : "bg-gray-100 text-gray-700"
               }`}
             >
