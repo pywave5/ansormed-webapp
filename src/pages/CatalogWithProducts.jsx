@@ -111,7 +111,7 @@ export default function CategoriesWithProducts() {
                   : "bg-gray-100 text-gray-700"
               }`}
             >
-              {c.title}
+              {c.name}
             </button>
           ))}
         </div>
