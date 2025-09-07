@@ -6,6 +6,7 @@ export default function CategoriesWithProducts() {
   const [activeCategory, setActiveCategory] = useState(null);
   const [productsByCategory, setProductsByCategory] = useState({});
   const sectionRefs = useRef({});
+  const buttonRefs = useRef({});
   const [headerHeight, setHeaderHeight] = useState(0);
 
   // Загружаем категории
@@ -38,9 +39,7 @@ export default function CategoriesWithProducts() {
   // вычисляем высоту header
   useEffect(() => {
     const header = document.querySelector("header");
-    if (header) {
-      setHeaderHeight(header.offsetHeight);
-    }
+    if (header) setHeaderHeight(header.offsetHeight);
     const handleResize = () => {
       if (header) setHeaderHeight(header.offsetHeight);
     };
@@ -58,7 +57,7 @@ export default function CategoriesWithProducts() {
         }
       },
       {
-        rootMargin: `-${headerHeight + 50}px 0px -70% 0px`, // учитываем высоту хедера
+        rootMargin: `-${headerHeight + 50}px 0px -70% 0px`,
         threshold: 0,
       }
     );
@@ -69,6 +68,17 @@ export default function CategoriesWithProducts() {
 
     return () => observer.disconnect();
   }, [categories, headerHeight]);
+
+  // скроллим категории так, чтобы активная была по центру
+  useEffect(() => {
+    if (activeCategory && buttonRefs.current[activeCategory]) {
+      buttonRefs.current[activeCategory].scrollIntoView({
+        inline: "center",
+        behavior: "smooth",
+        block: "nearest",
+      });
+    }
+  }, [activeCategory]);
 
   const scrollToCategory = (id) => {
     const section = sectionRefs.current[id];
@@ -93,6 +103,7 @@ export default function CategoriesWithProducts() {
           {categories.map((c) => (
             <button
               key={c.id}
+              ref={(el) => (buttonRefs.current[c.id] = el)}
               onClick={() => scrollToCategory(c.id)}
               className={`px-4 py-2 rounded-xl text-sm whitespace-nowrap transition ${
                 activeCategory === c.id
@@ -115,7 +126,9 @@ export default function CategoriesWithProducts() {
             data-id={c.id}
             className="mb-10"
           >
+            {/* Заголовок категории */}
             <h2 className="text-lg font-bold mb-3">{c.title}</h2>
+
             {productsByCategory[c.id] ? (
               <div className="grid grid-cols-2 gap-4">
                 {productsByCategory[c.id].map((p) => (
