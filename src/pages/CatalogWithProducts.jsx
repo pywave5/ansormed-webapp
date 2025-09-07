@@ -127,7 +127,9 @@ export default function CategoriesWithProducts() {
             className="mb-10"
             >
             {/* Заголовок категории */}
-            <h1 className="text-gray-900 font-bold mb-3">{c.name}</h1>
+            {productsByCategory[c.id] && productsByCategory[c.id].length > 0 && (
+                <h1 className="text-gray-900 font-bold mb-3">{c.name}</h1>
+            )}
 
             {productsByCategory[c.id] && productsByCategory[c.id].length > 0 ? (
                 <div className="grid grid-cols-2 gap-4">
