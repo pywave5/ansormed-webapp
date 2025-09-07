@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { getCategories, getProducts } from "../services/api";
+import { useHaptic } from "../hooks/useHaptic";
+import ProductModal from "../components/ProductModal";
 
 export default function CategoriesWithProducts() {
   const [categories, setCategories] = useState([]);
@@ -8,6 +10,8 @@ export default function CategoriesWithProducts() {
   const sectionRefs = useRef({});
   const buttonRefs = useRef({});
   const [headerHeight, setHeaderHeight] = useState(0);
+  const { tap } = useHaptic();
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   // Загружаем категории
   useEffect(() => {
@@ -136,6 +140,7 @@ export default function CategoriesWithProducts() {
                 {productsByCategory[c.id].map((p) => (
                     <div
                     key={p.id}
+                    onClick={() => { tap(); setSelectedProduct(p); }}
                     className="bg-white rounded-xl shadow-md hover:shadow-xl transition cursor-pointer overflow-hidden relative"
                     >
                     {p.discount > 0 && (
@@ -182,6 +187,12 @@ export default function CategoriesWithProducts() {
             </section>
         ))}
         </div>
+        {selectedProduct && (
+          <ProductModal
+          product={selectedProduct}
+          onClose={() => setSelectedProduct(null)}
+        />
+      )}
     </div>
   );
 }
