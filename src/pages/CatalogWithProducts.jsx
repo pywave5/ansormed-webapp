@@ -117,69 +117,69 @@ export default function CategoriesWithProducts() {
         </div>
       </div>
 
-      {/* Секции товаров */}
-      <div className="p-3">
+        {/* Секции товаров */}
+        <div className="p-3">
         {categories.map((c) => (
-          <section
+            <section
             key={c.id}
             ref={(el) => (sectionRefs.current[c.id] = el)}
             data-id={c.id}
             className="mb-10"
-          >
+            >
             {/* Заголовок категории */}
-            <h2 className="text-lg font-bold mb-3">{c.title}</h2>
+            <h2 className="text-lg font-bold mb-3">{c.name}</h2>
 
-            {productsByCategory[c.id] ? (
-              <div className="grid grid-cols-2 gap-4">
+            {productsByCategory[c.id] && productsByCategory[c.id].length > 0 ? (
+                <div className="grid grid-cols-2 gap-4">
                 {productsByCategory[c.id].map((p) => (
-                  <div
+                    <div
                     key={p.id}
                     className="bg-white rounded-xl shadow-md hover:shadow-xl transition cursor-pointer overflow-hidden relative"
-                  >
+                    >
                     {p.discount > 0 && (
-                      <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow">
+                        <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow">
                         -{p.discount}%
-                      </span>
+                        </span>
                     )}
                     {p.image && (
-                      <figure className="bg-gray-50 flex justify-center">
+                        <figure className="bg-gray-50 flex justify-center">
                         <img
-                          src={p.image}
-                          alt={p.title}
-                          className="h-24 object-contain"
+                            src={p.image}
+                            alt={p.title}
+                            className="h-24 object-contain"
                         />
-                      </figure>
+                        </figure>
                     )}
                     <div className="p-3 text-center">
-                      <h3 className="font-medium text-gray-900 text-sm truncate">
+                        <h3 className="font-medium text-gray-900 text-sm truncate">
                         {p.title}
-                      </h3>
-                      <div className="mt-1">
+                        </h3>
+                        <div className="mt-1">
                         {p.discount > 0 ? (
-                          <>
+                            <>
                             <span className="text-gray-400 line-through text-xs block">
-                              {p.price.toLocaleString()} сум
+                                {p.price.toLocaleString()} сум
                             </span>
                             <span className="font-bold text-red-600 text-sm block">
-                              {p.final_price.toLocaleString()} сум
+                                {p.final_price.toLocaleString()} сум
                             </span>
-                          </>
+                            </>
                         ) : (
-                          <span className="font-bold text-green-600 text-sm block">
+                            <span className="font-bold text-green-600 text-sm block">
                             {p.price.toLocaleString()} сум
-                          </span>
+                            </span>
                         )}
-                      </div>
+                        </div>
                     </div>
-                  </div>
+                    </div>
                 ))}
-              </div>
-            ) : (
-              <p className="text-gray-400">Загрузка...</p>
-            )}
-          </section>
+                </div>
+            ) : productsByCategory[c.id] ? (
+                <p className="text-gray-400">Нет товаров</p>
+            ) : null}
+            </section>
         ))}
-      </div>
+        </div>
     </div>
   );
 }
