@@ -57,10 +57,14 @@ export default function CategoriesWithProducts() {
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && !loading) {
+        if (
+          entries[0].isIntersecting &&
+          !loading &&
+          products.length > 0 // защита от "прыжка" на старте
+        ) {
           if (page < totalPages) {
             setPage((p) => p + 1);
-          } else if (page >= totalPages) {
+          } else {
             const currentIndex = categories.findIndex(
               (c) => c.id === activeCategory
             );
@@ -68,6 +72,7 @@ export default function CategoriesWithProducts() {
             if (nextCategory) {
               setActiveCategory(nextCategory.id);
               setPage(1);
+              window.scrollTo({ top: 0, behavior: "smooth" }); // возврат к началу при смене категории
             }
           }
         }
@@ -84,7 +89,7 @@ export default function CategoriesWithProducts() {
         observer.unobserve(loaderRef.current);
       }
     };
-  }, [page, totalPages, categories, activeCategory, loading]);
+  }, [page, totalPages, categories, activeCategory, loading, products]);
 
   const handleSelectProduct = (product) => {
     tap();
@@ -93,8 +98,8 @@ export default function CategoriesWithProducts() {
 
   return (
     <div>
-      {/* Фиксированный блок категорий */}
-      <div className="sticky top-16 z-20 bg-white shadow-sm overflow-x-auto">
+      {/* Фиксированный блок категорий (под Header с pt-24) */}
+      <div className="sticky top-24 z-20 bg-white shadow-sm overflow-x-auto">
         <div className="flex space-x-4 p-3">
           {categories.map((cat) => (
             <button
@@ -102,6 +107,7 @@ export default function CategoriesWithProducts() {
               onClick={() => {
                 setActiveCategory(cat.id);
                 setPage(1);
+                window.scrollTo({ top: 0, behavior: "smooth" });
               }}
               className={`px-4 py-2 rounded-full whitespace-nowrap ${
                 activeCategory === cat.id
