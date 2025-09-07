@@ -113,12 +113,11 @@ export default function CatalogWithProducts() {
 
       {/* название категории */}
       {currentCategory && (
-        <h2 className="text-gray-500 font-semibold mb-3 mt-4">
+        <h1 className="text-gray-500 font-semibold mb-3 mt-4">
           {currentCategory.name}
-        </h2>
+        </h1>
       )}
 
-      {/* товары */}
       {products.length === 0 ? (
         <p className="text-gray-500">Нет товаров</p>
       ) : (
