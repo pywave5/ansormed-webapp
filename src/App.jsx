@@ -24,7 +24,7 @@ export default function App() {
     tg.ready();
     tg.disableVerticalSwipes();
 
-    const insetTop = tg.safeAreaInsetTop ?? 50;
+    const insetTop = tg.safeAreaInsetTop ?? 60;
     setSafeTop(insetTop);
 
     if (tg.platform === "android" || tg.platform === "ios") {
