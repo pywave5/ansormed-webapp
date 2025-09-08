@@ -13,7 +13,7 @@ export default function Header({ onSearch, safeTop }) {
     <header
       className="bg-blue-600 fixed top-0 left-0 w-full z-50 shadow-md"
       style={{
-        paddingTop: `${safeTop}px`, // ✅ добавляем отступ только если есть safeTop
+        top: `${safeTop}px`, // ✅ добавляем отступ только если есть safeTop
       }}
     >
       <div className="max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
