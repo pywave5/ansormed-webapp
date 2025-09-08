@@ -28,7 +28,7 @@ export default function App() {
     if (tg.platform === "android" || tg.platform === "ios") {
       tg.expand();
       tg.requestFullscreen?.();
-      setHeaderPadding("pt-40");
+      setHeaderPadding("pt-24");
     } else {
       tg.exitFullscreen?.();
       setHeaderPadding("pt-6");
