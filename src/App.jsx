@@ -47,7 +47,7 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <div className="min-h-screen bg-gray-100 pb-24">
-        <Header />
+        <Header headerPadding={headerPadding} />
 
         <div className={`max-w-6xl mx-auto p-6 space-y-8 ${headerPadding}`}>
           {activePage === "catalog" && <Catalog />}
