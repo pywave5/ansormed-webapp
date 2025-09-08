@@ -11,9 +11,9 @@ export default function Header({ onSearch, safeTop }) {
 
   return (
     <header
-      className="bg-blue-600 fixed top-0 left-0 w-full z-40 shadow-md"
+      className="bg-blue-600 fixed top-0 pt-24 left-0 w-full z-40 shadow-md"
       style={{
-        height: `${safeTop + 64}px`, // ✅ фон до верха (safeTop + высота шапки)
+        height: `${safeTop + 64}px`
       }}
     >
       <div
