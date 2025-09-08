@@ -19,6 +19,7 @@ export default function App() {
   const [activePage, setActivePage] = useState("catalog");
   const [loading, setLoading] = useState(true);
   const [telegramId, setTelegramId] = useState(null);
+  const [headerPadding, setHeaderPadding] = useState("pt-40");
 
   useEffect(() => {
     tg.ready();
@@ -27,8 +28,10 @@ export default function App() {
     if (tg.platform === "android" || tg.platform === "ios") {
       tg.expand();
       tg.requestFullscreen?.();
+      setHeaderPadding("pt-40");
     } else {
       tg.exitFullscreen?.();
+      setHeaderPadding("pt-0");
     }
 
     if (tg.initDataUnsafe?.user?.id) {
@@ -46,7 +49,7 @@ export default function App() {
       <div className="min-h-screen bg-gray-100 pb-24">
         <Header />
 
-        <div className="max-w-6xl mx-auto p-6 pt-40 space-y-8">
+        <div className={`max-w-6xl mx-auto p-6 space-y-8 ${headerPadding}`}>
           {activePage === "catalog" && <Catalog />}
           {activePage === "cart" && <Cart />}
           {activePage === "profile" && <Profile />}
