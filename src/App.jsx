@@ -9,8 +9,6 @@ import Profile from "./pages/Profile";
 import History from "./pages/History";
 
 import { tg } from "./services/telegram";
-
-// импортируем react-query
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient();
@@ -19,13 +17,14 @@ export default function App() {
   const [activePage, setActivePage] = useState("catalog");
   const [loading, setLoading] = useState(true);
   const [telegramId, setTelegramId] = useState(null);
-  const [safeTop, setSafeTop] = useState(0); // ✅ добавили safeTop
-  const [searchQuery, setSearchQuery] = useState(""); // ✅ для поиска
+  const [safeTop, setSafeTop] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     tg.ready();
     tg.disableVerticalSwipes();
 
+    // Берём отступ сверху (панель телеграма)
     const insetTop = tg.safeAreaInsetTop || 0;
     setSafeTop(insetTop);
 
@@ -53,14 +52,20 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <div className="min-h-screen bg-gray-100 pb-24">
+        {/* Передаём safeTop в хедер */}
         <Header onSearch={handleSearch} safeTop={safeTop} />
 
-        <div className="max-w-6xl mx-auto p-6" style={{ paddingTop: `${safeTop + 64}px` }}>
+        {/* Контент под хедером */}
+        <div
+          className="max-w-6xl mx-auto p-6"
+          style={{ paddingTop: `${safeTop + 64}px` }} // 64px = высота хедера
+        >
           {activePage === "catalog" && <Catalog searchQuery={searchQuery} />}
           {activePage === "cart" && <Cart />}
           {activePage === "profile" && <Profile />}
           {activePage === "history" && <History telegramId={telegramId} />}
         </div>
+
         <BottomNav active={activePage} setActive={setActivePage} />
       </div>
     </QueryClientProvider>
