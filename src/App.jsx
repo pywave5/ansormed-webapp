@@ -55,7 +55,7 @@ export default function App() {
       <div className="min-h-screen bg-gray-100 pb-24">
         <Header onSearch={handleSearch} safeTop={safeTop} />
 
-        <div className="max-w-6xl mx-auto p-6 pt-40 space-y-8">
+        <div className="max-w-6xl mx-auto p-6" style={{ paddingTop: `${safeTop + 64}px` }}>
           {activePage === "catalog" && <Catalog searchQuery={searchQuery} />}
           {activePage === "cart" && <Cart />}
           {activePage === "profile" && <Profile />}
