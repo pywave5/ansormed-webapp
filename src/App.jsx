@@ -19,6 +19,8 @@ export default function App() {
   const [activePage, setActivePage] = useState("catalog");
   const [loading, setLoading] = useState(true);
   const [telegramId, setTelegramId] = useState(null);
+  const [safeTop, setSafeTop] = useState(0); // ✅ добавили safeTop
+  const [searchQuery, setSearchQuery] = useState(""); // ✅ для поиска
 
   useEffect(() => {
     tg.ready();
@@ -44,13 +46,17 @@ export default function App() {
 
   if (loading) return <SplashScreen />;
 
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+  };
+
   return (
     <QueryClientProvider client={queryClient}>
       <div className="min-h-screen bg-gray-100 pb-24">
         <Header onSearch={handleSearch} safeTop={safeTop} />
 
         <div className="max-w-6xl mx-auto p-6 pt-40 space-y-8">
-          {activePage === "catalog" && <Catalog />}
+          {activePage === "catalog" && <Catalog searchQuery={searchQuery} />}
           {activePage === "cart" && <Cart />}
           {activePage === "profile" && <Profile />}
           {activePage === "history" && <History telegramId={telegramId} />}
