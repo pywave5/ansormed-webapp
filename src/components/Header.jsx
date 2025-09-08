@@ -11,20 +11,24 @@ export default function Header({ onSearch, safeTop }) {
 
   return (
     <header
-      className="bg-blue-600 fixed top-0 left-0 w-full z-50 shadow-md"
+      className="bg-blue-600 fixed top-0 left-0 w-full z-40 shadow-md"
       style={{
-        paddingTop: `${safeTop}px`, // ✅ отступ под системные кнопки
+        height: `${safeTop + 64}px`, // ✅ фон до верха (safeTop + высота шапки)
       }}
     >
-      <div className="max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
-        {/* Лого */}
+      <div
+        className="max-w-6xl mx-auto flex items-center justify-between px-4"
+        style={{
+          paddingTop: `${safeTop}px`, // ✅ контент ниже кнопок
+          height: "64px",
+        }}
+      >
         <div className="flex items-center gap-2">
           <span className="text-white font-bold text-xl tracking-wide">
             ansormed
           </span>
         </div>
 
-        {/* Поиск */}
         <form
           onSubmit={handleSubmit}
           className="flex-1 max-w-md ml-6 relative"
