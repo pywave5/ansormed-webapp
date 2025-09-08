@@ -24,8 +24,7 @@ export default function App() {
     tg.ready();
     tg.disableVerticalSwipes();
 
-    // Берём отступ сверху (панель телеграма)
-    const insetTop = tg.safeAreaInsetTop || 0;
+    const insetTop = tg.safeAreaInsetTop ?? 50;
     setSafeTop(insetTop);
 
     if (tg.platform === "android" || tg.platform === "ios") {
