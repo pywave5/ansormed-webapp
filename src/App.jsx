@@ -49,7 +49,7 @@ export default function App() {
       <div className="min-h-screen bg-gray-100 pb-24">
         <Header headerPadding={headerPadding} variant={activePage} />
 
-        <div className={`max-w-6xl mx-auto p-6 space-y-8 ${headerPadding}`}>
+        <div className={`max-w-6xl mx-auto p-6 space-y-8`}>
           {activePage === "catalog" && <Catalog />}
           {activePage === "cart" && <Cart />}
           {activePage === "profile" && <Profile />}
