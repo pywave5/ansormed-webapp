@@ -10,11 +10,6 @@
   scrollbar-width: none; /* Firefox */
 }
 
-header {
-  padding-top: constant(safe-area-inset-top); /* старый iOS */
-  padding-top: env(safe-area-inset-top);      /* новый iOS */
-}
-
 * {
   user-select: none;   
   -webkit-user-select: none;
