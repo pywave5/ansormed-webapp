@@ -43,7 +43,7 @@ export default function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="min-h-screen bg-gray-100 pb-24 scrollbar-hide">
+      <div className="min-h-screen bg-gray-100 pb-24">
         <Header />
 
         <div className="max-w-6xl mx-auto p-6 pt-40 space-y-8">

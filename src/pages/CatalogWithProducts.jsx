@@ -100,7 +100,7 @@ export default function CategoriesWithProducts() {
     <div>
       {/* Фиксированные категории под хедером */}
       <div
-        className="z-40 bg-gray-100 shadow-sm overflow-x-auto"
+        className="z-40 bg-gray-100 shadow-sm overflow-x-auto scrollbar-hide"
         style={{ position: "sticky", top: headerHeight }}
       >
         <div className="flex gap-3 px-3 py-2">
