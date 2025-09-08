@@ -24,6 +24,9 @@ export default function App() {
     tg.ready();
     tg.disableVerticalSwipes();
 
+    const insetTop = tg.safeAreaInsetTop || 0;
+    setSafeTop(insetTop);
+
     if (tg.platform === "android" || tg.platform === "ios") {
       tg.expand();
       tg.requestFullscreen?.();
@@ -44,7 +47,7 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <div className="min-h-screen bg-gray-100 pb-24">
-        <Header />
+        <Header onSearch={handleSearch} safeTop={safeTop} />
 
         <div className="max-w-6xl mx-auto p-6 pt-40 space-y-8">
           {activePage === "catalog" && <Catalog />}
