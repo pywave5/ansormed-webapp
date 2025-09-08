@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Search } from "lucide-react";
 
-export default function Header({ onSearch, safeTop = 0 }) {
+export default function Header({ onSearch }) {
   const [query, setQuery] = useState("");
 
   const handleSubmit = (e) => {
@@ -12,14 +12,12 @@ export default function Header({ onSearch, safeTop = 0 }) {
   return (
     <header
       className="bg-blue-600 fixed top-0 left-0 w-full z-50 shadow-md"
-      style={{ minHeight: safeTop + 64 }} // фон тянется выше
+      style={{
+        // фон тянется под системные кнопки
+        paddingTop: "env(safe-area-inset-top)", 
+      }}
     >
-      {/* Контейнер контента */}
-      <div
-        className="max-w-6xl mx-auto flex items-center justify-between px-4 py-3"
-        style={{ paddingTop: safeTop, height: "100%" }} // контент ниже кнопок
-      >
-        {/* Лого */}
+      <div className="max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
         <div className="flex items-center gap-2">
           <span className="text-white font-bold text-xl tracking-wide">
             ansormed
