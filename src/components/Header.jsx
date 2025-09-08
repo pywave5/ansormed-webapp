@@ -12,9 +12,10 @@ export default function Header({ onSearch, safeTop = 0 }) {
   return (
     <header
       className="bg-blue-600 fixed top-0 left-0 w-full z-50 shadow-md"
-      style={{ paddingTop: safeTop }} // фон учитывает системную зону
+      style={{ paddingTop: safeTop }} // фон расширяется до кнопок
     >
-      <div className="max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
+      {/* Внутренний блок — отступаем ещё вниз от системной зоны */}
+      <div className="max-w-6xl mx-auto flex items-center justify-between px-4 py-3 pt-2">
         {/* Лого */}
         <div className="flex items-center gap-2">
           <span className="text-white font-bold text-xl tracking-wide">
