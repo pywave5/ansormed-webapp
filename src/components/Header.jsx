@@ -17,7 +17,7 @@ export default function Header({ onSearch, safeTop = 0 }) {
       {/* Контейнер контента */}
       <div
         className="max-w-6xl mx-auto flex items-center justify-between px-4 py-3"
-        style={{ paddingTop: safeTop }} // контент ниже кнопок
+        style={{ paddingTop: safeTop, height: "100%" }} // контент ниже кнопок
       >
         {/* Лого */}
         <div className="flex items-center gap-2">
