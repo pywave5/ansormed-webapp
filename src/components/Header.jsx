@@ -14,8 +14,7 @@ export default function Header({ onSearch, headerPadding, variant }) {
   return (
     <header className="bg-blue-600 fixed top-0 left-0 w-full z-50 shadow-md">
       <div
-        className={`max-w-6xl mx-auto flex items-center justify-between px-4 
-        ${isCatalog ? `py-3 ${headerPadding}` : "py-12 h-12"}`}
+        className={`max-w-6xl mx-auto flex items-center justify-between px-4 ${isCatalog ? headerSize : "py-2"} ${headerPadding}`}
       >
         {isCatalog ? (
           <>

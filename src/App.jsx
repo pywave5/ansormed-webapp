@@ -20,6 +20,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [telegramId, setTelegramId] = useState(null);
   const [headerPadding, setHeaderPadding] = useState("pt-40");
+  const [headerSize, setHeaderSize] = useState("py-12");
 
   useEffect(() => {
     tg.ready();
@@ -29,9 +30,11 @@ export default function App() {
       tg.expand();
       tg.requestFullscreen?.();
       setHeaderPadding("pt-24");
+      setHeaderSize("py-12");
     } else {
       tg.exitFullscreen?.();
       setHeaderPadding("pt-6");
+      setHeaderSize("py-4");
     }
 
     if (tg.initDataUnsafe?.user?.id) {
@@ -47,7 +50,7 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <div className="min-h-screen bg-gray-100 pb-24">
-        <Header headerPadding={headerPadding} variant={activePage} />
+        <Header headerPadding={headerPadding} headerSize={headerSize} variant={activePage} />
 
         <div className={`max-w-6xl mx-auto p-6 space-y-8 ${headerPadding}`}>
           {activePage === "catalog" && <Catalog />}
