@@ -84,84 +84,14 @@ export default function Products({ selectedId, onCategoryChange }) {
   const currentCategory = categories.find((c) => c.id === selectedId);
 
   return (
-    <div className="pt-24"> {/* отступ под fixed Header */}
-      
-      {/* полоска категорий */}
-      <div className="sticky top-24 bg-gray-100 z-10 pb-2">
-        {/* тут твой Categories компонент */}
+    <div className="pt-24 bg-red-100 min-h-screen">
+      <div className="bg-yellow-300 sticky top-24 z-10">
+        <p>Полоска категорий</p>
       </div>
 
-      {/* название текущей категории */}
-      {currentCategory && (
-        <h1 className="text-lg font-semibold mb-3 mt-16">
-          {currentCategory.name}
-        </h1>
-      )}
-
-      {/* товары */}
-      {products.length === 0 ? (
-        <p className="text-gray-500">Нет товаров</p>
-      ) : (
-        <>
-          <div className="grid grid-cols-2 gap-4">
-            {products.map((p) => (
-              <div
-                key={p.id}
-                onClick={() => handleSelectProduct(p)}
-                className="bg-white rounded-xl shadow-md hover:shadow-xl transition cursor-pointer overflow-hidden relative"
-              >
-                {p.discount > 0 && (
-                  <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow">
-                    -{p.discount}%
-                  </span>
-                )}
-
-                {p.image && (
-                  <figure className="bg-gray-50 flex justify-center">
-                    <img
-                      src={p.image}
-                      alt={p.title}
-                      className="h-24 object-contain"
-                    />
-                  </figure>
-                )}
-                <div className="p-3 text-center">
-                  <h3 className="font-medium text-gray-900 text-sm truncate">
-                    {p.title}
-                  </h3>
-
-                  <div className="mt-1">
-                    {p.discount > 0 ? (
-                      <>
-                        <span className="text-gray-400 line-through text-xs block">
-                          {p.price.toLocaleString()} сум
-                        </span>
-                        <span className="font-bold text-red-600 text-sm block">
-                          {p.final_price.toLocaleString()} сум
-                        </span>
-                      </>
-                    ) : (
-                      <span className="font-bold text-green-600 text-sm block">
-                        {p.price.toLocaleString()} сум
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Невидимый "триггер" для подгрузки */}
-          <div ref={loaderRef} className="h-10"></div>
-        </>
-      )}
-
-      {selectedProduct && (
-        <ProductModal
-          product={selectedProduct}
-          onClose={() => setSelectedProduct(null)}
-        />
-      )}
+      <h1 className="text-lg font-semibold mb-3 mt-16 bg-green-300">
+        Название категории
+      </h1>
     </div>
   );
 }
