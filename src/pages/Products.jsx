@@ -84,7 +84,7 @@ export default function Products({ selectedId, onCategoryChange }) {
   const currentCategory = categories.find((c) => c.id === selectedId);
 
   return (
-    <div className="pt-28">
+    <div className="pt-32">
       {/* название текущей категории */}
       {currentCategory && (
         <h1 className="text-lg font-semibold mb-3 mt-4">
