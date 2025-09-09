@@ -15,7 +15,7 @@ export default function Header({ onSearch, headerPadding, variant }) {
     <header className="bg-blue-600 fixed top-0 left-0 w-full z-50 shadow-md">
       <div
         className={`max-w-6xl mx-auto flex items-center justify-between px-4 
-        ${isCatalog ? `py-3 ${headerPadding}` : "py-2 h-12"}`}
+        ${isCatalog ? `py-3 ${headerPadding}` : "py-2 h-15"}`}
       >
         {isCatalog ? (
           <>
@@ -38,7 +38,7 @@ export default function Header({ onSearch, headerPadding, variant }) {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 className="w-full bg-white text-black placeholder-gray-500 
-                          rounded-full pl-10 pr-4 py-2 shadow-sm
+                          rounded-md pl-10 pr-4 py-2 shadow-sm
                           focus:outline-none focus:ring-2 focus:ring-blue-300
                           border border-gray-300"
               />
