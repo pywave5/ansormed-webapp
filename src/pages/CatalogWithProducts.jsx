@@ -3,18 +3,21 @@ import { getCategories, getProducts } from "../services/api";
 import { useHaptic } from "../hooks/useHaptic";
 import ProductModal from "../components/ProductModal";
 
-export default function CatalogWithProducts() {
+export default function CategoriesWithProducts() {
   const [categories, setCategories] = useState([]);
   const [activeCategory, setActiveCategory] = useState(null);
-  const [products, setProducts] = useState([]);
-  const [page, setPage] = useState(1);
-  const [hasNext, setHasNext] = useState(true);
+  const [productsByCategory, setProductsByCategory] = useState({});
+  const [pagesByCategory, setPagesByCategory] = useState({});
+  const [hasNextByCategory, setHasNextByCategory] = useState({});
   const [loading, setLoading] = useState(false);
+
+  const sectionRefs = useRef({});
   const buttonRefs = useRef({});
+  const [headerHeight, setHeaderHeight] = useState(0);
   const { tap } = useHaptic();
   const [selectedProduct, setSelectedProduct] = useState(null);
 
-  // загружаем категории
+  // Загружаем категории
   useEffect(() => {
     getCategories()
       .then((data) => {
@@ -24,49 +27,65 @@ export default function CatalogWithProducts() {
       .catch((err) => console.error("Ошибка категорий:", err));
   }, []);
 
-  // загружаем товары при смене категории
+  // Загружаем первую страницу товаров по категориям
   useEffect(() => {
-    if (!activeCategory) return;
-
-    setProducts([]);
-    setPage(1);
-    setHasNext(true);
-    fetchProducts(activeCategory, 1);
-  }, [activeCategory]);
-
-  const fetchProducts = async (categoryId, pageNum) => {
-    if (loading) return;
-    setLoading(true);
-
-    try {
-      const data = await getProducts(categoryId, pageNum);
-      setProducts((prev) => [...prev, ...(data.results || [])]);
-      setHasNext(Boolean(data.next));
-      setPage(pageNum);
-    } catch (err) {
-      console.error("Ошибка загрузки товаров:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // подгрузка товаров при скролле вниз
-  useEffect(() => {
-    const handleScroll = () => {
-      if (
-        window.innerHeight + window.scrollY >=
-          document.body.offsetHeight - 300 &&
-        hasNext &&
-        !loading
-      ) {
-        fetchProducts(activeCategory, page + 1);
+    const fetchAll = async () => {
+      const newProducts = {};
+      const newPages = {};
+      const newHasNext = {};
+      for (let cat of categories) {
+        try {
+          const data = await getProducts(cat.id, 1);
+          newProducts[cat.id] = data.results || [];
+          newPages[cat.id] = 1;
+          newHasNext[cat.id] = Boolean(data.next);
+        } catch (err) {
+          newProducts[cat.id] = [];
+          newPages[cat.id] = 1;
+          newHasNext[cat.id] = false;
+        }
       }
+      setProductsByCategory(newProducts);
+      setPagesByCategory(newPages);
+      setHasNextByCategory(newHasNext);
     };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [activeCategory, page, hasNext, loading]);
+    if (categories.length > 0) fetchAll();
+  }, [categories]);
 
-  // скроллим таб активной категории к центру
+  // вычисляем высоту header
+  useEffect(() => {
+    const header = document.querySelector("header");
+    if (header) setHeaderHeight(header.offsetHeight);
+    const handleResize = () => {
+      if (header) setHeaderHeight(header.offsetHeight);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // отслеживаем какая категория сейчас на экране
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.find((e) => e.isIntersecting);
+        if (visible) {
+          setActiveCategory(parseInt(visible.target.dataset.id));
+        }
+      },
+      {
+        rootMargin: `-${headerHeight + 50}px 0px -70% 0px`,
+        threshold: 0,
+      }
+    );
+
+    Object.values(sectionRefs.current).forEach((el) =>
+      el ? observer.observe(el) : null
+    );
+
+    return () => observer.disconnect();
+  }, [categories, headerHeight]);
+
+  // скроллим категории так, чтобы активная была по центру
   useEffect(() => {
     if (activeCategory && buttonRefs.current[activeCategory]) {
       buttonRefs.current[activeCategory].scrollIntoView({
@@ -77,19 +96,69 @@ export default function CatalogWithProducts() {
     }
   }, [activeCategory]);
 
+  // lazy load: догружаем товары при скролле вниз
+  useEffect(() => {
+    const handleScroll = () => {
+      if (loading) return;
+
+      const bottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 300;
+      if (bottom) {
+        const current = activeCategory;
+        if (current && hasNextByCategory[current]) {
+          fetchMore(current);
+        }
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [activeCategory, productsByCategory, hasNextByCategory, pagesByCategory, loading]);
+
+  const fetchMore = async (catId) => {
+    if (loading) return;
+    setLoading(true);
+    try {
+      const nextPage = pagesByCategory[catId] + 1;
+      const data = await getProducts(catId, nextPage);
+
+      setProductsByCategory((prev) => ({
+        ...prev,
+        [catId]: [...(prev[catId] || []), ...(data.results || [])],
+      }));
+      setPagesByCategory((prev) => ({ ...prev, [catId]: nextPage }));
+      setHasNextByCategory((prev) => ({
+        ...prev,
+        [catId]: Boolean(data.next),
+      }));
+    } catch (err) {
+      console.error("Ошибка подгрузки:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const scrollToCategory = (id) => {
+    const section = sectionRefs.current[id];
+    if (section) {
+      const y =
+        section.getBoundingClientRect().top + window.scrollY - headerHeight - 10;
+      window.scrollTo({ top: y, behavior: "smooth" });
+    }
+  };
+
   return (
     <div>
-      {/* Полоска категорий */}
-      <div className="sticky top-0 z-40 bg-gray-100 shadow-sm overflow-x-auto scrollbar-hide">
+      {/* Фиксированные категории под хедером */}
+      <div
+        className="z-40 bg-gray-100 shadow-sm overflow-x-auto scrollbar-hide"
+        style={{ position: "sticky", top: headerHeight }}
+      >
         <div className="flex gap-3 px-3 py-2">
           {categories.map((c) => (
             <button
               key={c.id}
               ref={(el) => (buttonRefs.current[c.id] = el)}
-              onClick={() => {
-                tap();
-                setActiveCategory(c.id);
-              }}
+              onClick={() => scrollToCategory(c.id)}
               className={`px-4 py-2 rounded-xl text-sm whitespace-nowrap transition ${
                 activeCategory === c.id
                   ? "bg-blue-600 text-white"
@@ -102,63 +171,77 @@ export default function CatalogWithProducts() {
         </div>
       </div>
 
-      {/* Товары выбранной категории */}
+      {/* Секции товаров */}
       <div className="p-3">
-        {products.length > 0 ? (
-          <div className="grid grid-cols-2 gap-4">
-            {products.map((p) => (
-              <div
-                key={p.id}
-                onClick={() => {
-                  tap();
-                  setSelectedProduct(p);
-                }}
-                className="bg-white rounded-xl shadow-md hover:shadow-xl transition cursor-pointer overflow-hidden relative"
-              >
-                {p.discount > 0 && (
-                  <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow">
-                    -{p.discount}%
-                  </span>
-                )}
-                {p.image && (
-                  <figure className="bg-gray-50 flex justify-center">
-                    <img
-                      src={p.image}
-                      alt={p.title}
-                      className="h-24 object-contain"
-                    />
-                  </figure>
-                )}
-                <div className="p-3 text-center">
-                  <h3 className="font-medium text-gray-900 text-sm truncate">
-                    {p.title}
-                  </h3>
-                  <div className="mt-1">
-                    {p.discount > 0 ? (
-                      <>
-                        <span className="text-gray-400 line-through text-xs block">
-                          {p.price.toLocaleString()} сум
-                        </span>
-                        <span className="font-bold text-red-600 text-sm block">
-                          {p.final_price.toLocaleString()} сум
-                        </span>
-                      </>
-                    ) : (
-                      <span className="font-bold text-green-600 text-sm block">
-                        {p.price.toLocaleString()} сум
+        {categories.map((c) => (
+          <section
+            key={c.id}
+            ref={(el) => (sectionRefs.current[c.id] = el)}
+            data-id={c.id}
+            className="mb-10 pt-12"
+          >
+            {/* Заголовок категории */}
+            {productsByCategory[c.id] && productsByCategory[c.id].length > 0 && (
+              <h1 className="text-gray-900 font-bold mb-3">{c.name}</h1>
+            )}
+
+            {productsByCategory[c.id] && productsByCategory[c.id].length > 0 ? (
+              <div className="grid grid-cols-2 gap-4">
+                {productsByCategory[c.id].map((p) => (
+                  <div
+                    key={p.id}
+                    onClick={() => {
+                      tap();
+                      setSelectedProduct(p);
+                    }}
+                    className="bg-white rounded-xl shadow-md hover:shadow-xl transition cursor-pointer overflow-hidden relative"
+                  >
+                    {p.discount > 0 && (
+                      <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow">
+                        -{p.discount}%
                       </span>
                     )}
+                    {p.image && (
+                      <figure className="bg-gray-50 flex justify-center">
+                        <img
+                          src={p.image}
+                          alt={p.title}
+                          className="h-24 object-contain"
+                        />
+                      </figure>
+                    )}
+                    <div className="p-3 text-center">
+                      <h3 className="font-medium text-gray-900 text-sm truncate">
+                        {p.title}
+                      </h3>
+                      <div className="mt-1">
+                        {p.discount > 0 ? (
+                          <>
+                            <span className="text-gray-400 line-through text-xs block">
+                              {p.price.toLocaleString()} сум
+                            </span>
+                            <span className="font-bold text-red-600 text-sm block">
+                              {p.final_price.toLocaleString()} сум
+                            </span>
+                          </>
+                        ) : (
+                          <span className="font-bold text-green-600 text-sm block">
+                            {p.price.toLocaleString()} сум
+                          </span>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                </div>
+                ))}
               </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-gray-400">Нет товаров</p>
-        )}
-
-        {loading && <p className="text-center py-4">Загрузка...</p>}
+            ) : productsByCategory[c.id] ? (
+              <p className="text-gray-400">Нет товаров</p>
+            ) : null}
+          </section>
+        ))}
       </div>
+
+      {loading && <p className="text-center py-4">Загрузка...</p>}
 
       {selectedProduct && (
         <ProductModal
