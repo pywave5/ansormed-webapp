@@ -93,7 +93,7 @@ export default function Products({ selectedId, onCategoryChange }) {
 
       {/* название текущей категории */}
       {currentCategory && (
-        <h1 className="text-lg font-semibold mb-3 mt-4">
+        <h1 className="text-lg font-semibold mb-3 mt-16">
           {currentCategory.name}
         </h1>
       )}
