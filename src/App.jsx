@@ -34,7 +34,7 @@ export default function App() {
     } else {
       tg.exitFullscreen?.();
       setHeaderPadding("pt-6");
-      setHeaderSize("py-4");
+      setHeaderSize("py-2");
     }
 
     if (tg.initDataUnsafe?.user?.id) {
