@@ -87,9 +87,9 @@ export default function Products({ selectedId, onCategoryChange }) {
     <div>
       {/* название текущей категории */}
       {currentCategory && (
-        <h2 className="text-lg font-semibold mb-3 mt-4">
+        <h1 className="text-lg font-semibold mb-3 mt-6">
           {currentCategory.name}
-        </h2>
+        </h1>
       )}
 
       {products.length === 0 ? (
