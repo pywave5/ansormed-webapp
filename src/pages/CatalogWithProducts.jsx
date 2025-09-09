@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { getCategories, getProducts } from "../services/api";
 import { useHaptic } from "../hooks/useHaptic";
-import ProductModal from "./ProductModal";
+import ProductModal from "../components/ProductModal";
 
 export default function CategoriesWithProducts() {
   const [categories, setCategories] = useState([]);
