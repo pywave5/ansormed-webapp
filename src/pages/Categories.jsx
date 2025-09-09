@@ -70,8 +70,8 @@ export default function Categories({ onSelect, selectedId }) {
         </div>
       </div>
 
-      {/* spacer чтобы контент не заезжал под sticky */}
-      <div className="mb-14"></div>
+      {/* spacer под полоску */}
+      <div className="h-12"></div>
     </>
   );
 }
