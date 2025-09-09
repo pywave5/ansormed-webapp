@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getCategories, getProducts } from "../api";
+import { getCategories, getProducts } from "../services/api";
 import { useHaptic } from "../hooks/useHaptic";
 import ProductModal from "./ProductModal";
 
