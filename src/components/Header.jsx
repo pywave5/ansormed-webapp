@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Search } from "lucide-react";
 
-export default function Header({ onSearch, headerPadding, variant }) {
+export default function Header({ onSearch, headerPadding, headerSize, variant }) {
   const [query, setQuery] = useState("");
 
   const handleSubmit = (e) => {
