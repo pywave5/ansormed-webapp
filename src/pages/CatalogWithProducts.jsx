@@ -128,7 +128,7 @@ export default function CategoriesWithProducts() {
             key={c.id}
             ref={(el) => (sectionRefs.current[c.id] = el)}
             data-id={c.id}
-            className="mb-10 pt-6"
+            className="mb-10 pt-12"
             >
             {/* Заголовок категории */}
             {productsByCategory[c.id] && productsByCategory[c.id].length > 0 && (
