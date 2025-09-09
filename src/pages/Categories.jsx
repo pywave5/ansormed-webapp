@@ -43,29 +43,35 @@ export default function Categories({ onSelect, selectedId }) {
   };
 
   return (
-    <div className="sticky top-0 bg-gray-100 z-10 pb-2">
-      <div
-        ref={scrollContainerRef}
-        className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide scroll-smooth"
-      >
-        {categories.map((c) => (
-          <button
-            key={c.id}
-            ref={(el) => {
-              if (el) buttonRefs.current[c.id] = el;
-            }}
-            onClick={() => handleSelect(c.id)}
-            className={`whitespace-nowrap px-4 py-2 rounded-full border transition flex-shrink-0 mb-6
-              ${
-                selectedId === c.id
-                  ? "bg-blue-500 text-white border-blue-500"
-                  : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200"
-              }`}
-          >
-            {c.name}
-          </button>
-        ))}
+    <>
+      {/* sticky панель с категориями */}
+      <div className="sticky top-0 bg-gray-100 z-10 pb-2">
+        <div
+          ref={scrollContainerRef}
+          className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide scroll-smooth"
+        >
+          {categories.map((c) => (
+            <button
+              key={c.id}
+              ref={(el) => {
+                if (el) buttonRefs.current[c.id] = el;
+              }}
+              onClick={() => handleSelect(c.id)}
+              className={`whitespace-nowrap px-4 py-2 rounded-full border transition flex-shrink-0
+                ${
+                  selectedId === c.id
+                    ? "bg-blue-500 text-white border-blue-500"
+                    : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200"
+                }`}
+            >
+              {c.name}
+            </button>
+          ))}
+        </div>
       </div>
-    </div>
+
+      {/* spacer чтобы контент не заезжал под sticky */}
+      <div className="h-14"></div>
+    </>
   );
 }
