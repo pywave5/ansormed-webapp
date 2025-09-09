@@ -3,7 +3,7 @@ import Header from "./components/Header";
 import BottomNav from "./components/BottomNav";
 import SplashScreen from "./components/SplashScreen";
 
-import Catalog from "./pages/Catalog";
+import CatalogWithProducts from "./pages/CatalogWithProducts";
 import Cart from "./pages/Cart";
 import Profile from "./pages/Profile";
 import History from "./pages/History";
@@ -53,7 +53,7 @@ export default function App() {
         <Header headerPadding={headerPadding} headerSize={headerSize} variant={activePage} />
 
         <div className={`max-w-6xl mx-auto p-6 space-y-8 ${headerPadding}`}>
-          {activePage === "catalog" && <Catalog />}
+          {activePage === "catalog" && <CatalogWithProducts />}
           {activePage === "cart" && <Cart />}
           {activePage === "profile" && <Profile />}
           {activePage === "history" && <History telegramId={telegramId} />}
