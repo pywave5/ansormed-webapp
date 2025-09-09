@@ -84,14 +84,21 @@ export default function Products({ selectedId, onCategoryChange }) {
   const currentCategory = categories.find((c) => c.id === selectedId);
 
   return (
-    <div className="pt-40">
+    <div className="pt-24"> {/* отступ под fixed Header */}
+      
+      {/* полоска категорий */}
+      <div className="sticky top-24 bg-gray-100 z-10 pb-2">
+        {/* тут твой Categories компонент */}
+      </div>
+
       {/* название текущей категории */}
       {currentCategory && (
-        <h1 className="text-lg font-semibold mb-3 mb-4">
+        <h1 className="text-lg font-semibold mb-3 mt-4">
           {currentCategory.name}
         </h1>
       )}
 
+      {/* товары */}
       {products.length === 0 ? (
         <p className="text-gray-500">Нет товаров</p>
       ) : (

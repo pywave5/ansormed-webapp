@@ -45,7 +45,7 @@ export default function Categories({ onSelect, selectedId }) {
   return (
     <>
       {/* sticky панель с категориями */}
-      <div className="sticky top-200 bg-gray-100 z-10 pb-2">
+      <div className="sticky top-20 bg-gray-100 z-10 pb-2">
         <div
           ref={scrollContainerRef}
           className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide scroll-smooth"
