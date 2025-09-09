@@ -43,7 +43,7 @@ export default function Categories({ onSelect, selectedId }) {
   };
 
   return (
-    <div className="sticky top-0 bg-gray-100 z-10 pb-2 mb-4">
+    <div className="sticky top-0 bg-gray-100 z-10 pb-2 mb-40">
       <div
         ref={scrollContainerRef}
         className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide scroll-smooth"
