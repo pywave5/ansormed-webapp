@@ -43,13 +43,7 @@ export default function Header({ onSearch, headerPadding, variant }) {
               />
             </form>
           </>
-        ) : (
-          <span className="text-white font-semibold text-lg">
-            {variant === "cart" && "Корзина"}
-            {variant === "profile" && "Профиль"}
-            {variant === "history" && "История"}
-          </span>
-        )}
+        ) : null}
       </div>
     </header>
   );
