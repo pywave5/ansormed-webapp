@@ -3,7 +3,7 @@ import Header from "./components/Header";
 import BottomNav from "./components/BottomNav";
 import SplashScreen from "./components/SplashScreen";
 
-import Catalog from "./pages/Catalog";
+import Catalog from "../pages/Catalog";
 import Cart from "./pages/Cart";
 import Profile from "./pages/Profile";
 import History from "./pages/History";
