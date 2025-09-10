@@ -9,7 +9,7 @@ import Profile from "./pages/Profile";
 import History from "./pages/History";
 
 import { tg } from "./services/telegram";
-import { getUserByTelegramId, updateUser } from "./services/api";
+import { authWithTelegram , updateUser } from "./services/api";
 import EditModal from "./components/EditModal";
 import { useHaptic } from "./hooks/useHaptic";
 import { useToast } from "./hooks/useToast";
@@ -52,7 +52,7 @@ export default function App() {
 
     async function fetchUser() {
       if (tg.initDataUnsafe?.user?.id) {
-        const data = await getUserByTelegramId(tg.initDataUnsafe.user.id);
+        const data = await authWithTelegram(tg.initData);
         setUser(data);
       }
       setLoading(false);
