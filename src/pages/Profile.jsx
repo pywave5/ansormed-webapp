@@ -5,23 +5,12 @@ import EditModal from "../components/EditModal";
 import { useHaptic } from "../hooks/useHaptic";
 import { useToast } from "../hooks/useToast";
 
-export default function Profile() {
+export default function Profile({ user, setUser}) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [editingField, setEditingField] = useState(null);
   const haptic = useHaptic();
   const { showToast, Toast } = useToast();
-
-  useEffect(() => {
-    async function fetchUser() {
-      if (tg.initDataUnsafe?.user?.id) {
-        const data = await getUserByTelegramId(tg.initDataUnsafe.user.id);
-        setUser(data);
-      }
-      setLoading(false);
-    }
-    fetchUser();
-  }, []);
 
   const formatPhone = (val) => {
     if (!val) return "";

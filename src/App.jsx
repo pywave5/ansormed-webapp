@@ -51,14 +51,17 @@ export default function App() {
     }
 
     async function fetchUser() {
-      if (tg.initDataUnsafe?.user?.id) {
+    try {
+      if (tg.initData) {
         const data = await authWithTelegram(tg.initData);
         setUser(data);
       }
+    } catch (err) {
+      console.error("Ошибка авторизации:", err);
+    } finally {
       setLoading(false);
     }
-    fetchUser();
-  }, []);
+  }
 
   const handleSavePhone = async (arg1, arg2) => {
     const newValue = typeof arg2 !== "undefined" ? arg2 : arg1;
