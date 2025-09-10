@@ -3,13 +3,17 @@ import Header from "./components/Header";
 import BottomNav from "./components/BottomNav";
 import SplashScreen from "./components/SplashScreen";
 
-import CatalogWithProducts from "./pages/CatalogWithProducts";
+import Catalog from "./pages/Catalog";
 import Cart from "./pages/Cart";
 import Profile from "./pages/Profile";
 import History from "./pages/History";
 
 import { tg } from "./services/telegram";
 import { getUserByTelegramId, updateUser } from "./services/api";
+import EditModal from "./components/EditModal";
+import { useHaptic } from "./hooks/useHaptic";
+import { useToast } from "./hooks/useToast";
+
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient();
@@ -18,11 +22,14 @@ export default function App() {
   const [activePage, setActivePage] = useState("catalog");
   const [loading, setLoading] = useState(true);
   const [telegramId, setTelegramId] = useState(null);
+  const [user, setUser] = useState(null);
+  const [editingPhone, setEditingPhone] = useState(false);
+
   const [headerPadding, setHeaderPadding] = useState("pt-40");
   const [headerSize, setHeaderSize] = useState("py-12");
-  const [user, setUser] = useState(null);
-  const [needPhone, setNeedPhone] = useState(false);
-  const [phoneInput, setPhoneInput] = useState("");
+
+  const haptic = useHaptic();
+  const { showToast, Toast } = useToast();
 
   useEffect(() => {
     tg.ready();
@@ -40,33 +47,65 @@ export default function App() {
     }
 
     if (tg.initDataUnsafe?.user?.id) {
-      const tId = tg.initDataUnsafe.user.id;
-      setTelegramId(tId);
-
-      getUserByTelegramId(tId).then((u) => {
-        setUser(u);
-        if (!u.phone_number) {
-          setNeedPhone(true);
-        }
-      });
+      setTelegramId(tg.initDataUnsafe.user.id);
     }
 
-    const timer = setTimeout(() => setLoading(false), 1500);
-    return () => clearTimeout(timer);
+    async function fetchUser() {
+      if (tg.initDataUnsafe?.user?.id) {
+        const data = await getUserByTelegramId(tg.initDataUnsafe.user.id);
+        setUser(data);
+      }
+      setLoading(false);
+    }
+    fetchUser();
   }, []);
 
-  const handleSavePhone = async () => {
-    if (!phoneInput.trim()) return;
+  const handleSavePhone = async (newValue) => {
+    if (!user) return;
+    const cleanValue = newValue.replace(/\D/g, "");
+
+    haptic.light();
     try {
-      const updated = await updateUser(user.id, { phone_number: phoneInput.replace(/\D/g, "") });
+      const updated = await updateUser(user.id, { ...user, phone_number: cleanValue });
       setUser(updated);
-      setNeedPhone(false);
+      haptic.success();
+      showToast("Ваш номер успешно сохранён ✅");
     } catch (err) {
       console.error("Ошибка при сохранении номера:", err);
+      haptic.error();
+      showToast("❌ Ошибка при сохранении");
     }
   };
 
   if (loading) return <SplashScreen />;
+
+  // 👉 Если номера телефона нет — показываем ввод
+  if (user && !user.phone_number) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen p-6 text-center bg-gray-100">
+        <p className="text-gray-700 mb-4 font-medium">
+          Пожалуйста, укажите номер телефона, чтобы пользоваться сервисом.
+        </p>
+        <button
+          className="bg-blue-500 text-white px-6 py-3 rounded-xl shadow hover:bg-blue-600 transition"
+          onClick={() => setEditingPhone(true)}
+        >
+          Ввести номер
+        </button>
+
+        <EditModal
+          isOpen={editingPhone}
+          onClose={() => setEditingPhone(false)}
+          field="phone_number"
+          label="Номер телефона"
+          value={user.phone_number}
+          onSave={handleSavePhone}
+        />
+
+        <Toast />
+      </div>
+    );
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -74,37 +113,14 @@ export default function App() {
         <Header headerPadding={headerPadding} headerSize={headerSize} variant={activePage} />
 
         <div className={`max-w-6xl mx-auto p-6 space-y-8 ${headerPadding}`}>
-          {/* 👉 если номер не указан, показываем заглушку */}
-          {needPhone ? (
-            <div className="bg-white shadow-md rounded-xl p-6 text-center">
-              <h2 className="text-lg font-semibold text-gray-800 mb-4">
-                Введите номер телефона, чтобы пользоваться приложением
-              </h2>
-              <input
-                type="tel"
-                value={phoneInput}
-                onChange={(e) => setPhoneInput(e.target.value)}
-                placeholder="+998 XX XXX XX XX"
-                className="w-full border rounded-lg p-2 text-center mb-4"
-              />
-              <button
-                onClick={handleSavePhone}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg w-full"
-              >
-                Сохранить
-              </button>
-            </div>
-          ) : (
-            <>
-              {activePage === "catalog" && <CatalogWithProducts />}
-              {activePage === "cart" && <Cart />}
-              {activePage === "profile" && <Profile />}
-              {activePage === "history" && <History telegramId={telegramId} />}
-            </>
-          )}
+          {activePage === "catalog" && <Catalog />}
+          {activePage === "cart" && <Cart />}
+          {activePage === "profile" && <Profile />}
+          {activePage === "history" && <History telegramId={telegramId} />}
         </div>
 
         <BottomNav active={activePage} setActive={setActivePage} />
+        <Toast />
       </div>
     </QueryClientProvider>
   );
