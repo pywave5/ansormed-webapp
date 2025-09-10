@@ -58,7 +58,7 @@ export default function App() {
         alert("Получен юзер: " + JSON.stringify(data));
       }
     } catch (err) {
-      alert("Ошибка авторизации: " + (err.response?.data || err.message));
+      alert("Ошибка авторизации: " + JSON.stringify(err.response?.data || err.message));
     } finally {
       setLoading(false);
     }
