@@ -79,7 +79,6 @@ export default function App() {
 
   if (loading) return <SplashScreen />;
 
-  // 👉 Если номера телефона нет — показываем ввод
   if (user && !user.phone_number) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-6 text-center bg-gray-100">
@@ -113,7 +112,7 @@ export default function App() {
         <Header headerPadding={headerPadding} headerSize={headerSize} variant={activePage} />
 
         <div className={`max-w-6xl mx-auto p-6 space-y-8 ${headerPadding}`}>
-          {activePage === "CatalogWithProducts" && <CatalogWithProducts />}
+          {activePage === "catalog" && <CatalogWithProducts />}
           {activePage === "cart" && <Cart />}
           {activePage === "profile" && <Profile />}
           {activePage === "history" && <History telegramId={telegramId} />}
