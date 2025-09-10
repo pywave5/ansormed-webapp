@@ -93,6 +93,7 @@ export default function App() {
   if (user && !user.phone_number) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-6 text-center bg-gray-100">
+        <Header headerPadding="pt-6" headerSize="py-2" variant="profile" />
         <p className="text-gray-700 mb-4 font-medium">
           Пожалуйста, укажите номер телефона, чтобы пользоваться сервисом.
         </p>
