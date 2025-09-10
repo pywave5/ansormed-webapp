@@ -99,7 +99,10 @@ export default function App() {
         </p>
         <button
           className="bg-blue-500 text-white px-6 py-3 rounded-xl shadow hover:bg-blue-600 transition"
-          onClick={() => setEditingPhone(true)}
+          onClick={() => {
+            haptic.light();
+            setEditingPhone(true);
+          }}
         >
           Ввести номер
         </button>
