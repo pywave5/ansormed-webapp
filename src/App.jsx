@@ -68,7 +68,7 @@ export default function App() {
     const cleanValue = String(newValue || "").replace(/\D/g, "");
 
     if (!cleanValue) {
-      showToast("Введите корректный номер!");
+      showToast("Введите корректный номер!", "error");
       haptic.error();
       return;
     }
@@ -79,11 +79,11 @@ export default function App() {
       setUser(updated);
       setEditingPhone(false);
       haptic.success();
-      showToast("Ваш номер успешно сохранён!");
+      showToast("Ваш номер успешно сохранён!", "success");
     } catch (err) {
       console.error("Ошибка при сохранении номера:", err);
       haptic.error();
-      showToast("Ошибка при сохранении");
+      showToast("Ошибка при сохранении", "error");
     }
   };
 

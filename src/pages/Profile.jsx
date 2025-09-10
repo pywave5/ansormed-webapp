@@ -59,19 +59,18 @@ export default function Profile() {
       }
     }
 
-    // 👉 Вибрация сразу
     haptic.light();
 
     try {
       const updated = await updateUser(user.id, { ...user, [field]: cleanValue });
       setUser(updated);
 
-      haptic.success(); // подтверждение
-      showToast("Ваши данные успешно изменены.");
+      haptic.success(); 
+      showToast("Ваши данные успешно изменены.", "success");
     } catch (err) {
       console.error("Ошибка при обновлении:", err);
       haptic.error();
-      showToast("❌ Ошибка при сохранении");
+      showToast("Ошибка при сохранении", "error");
     }
   };
 
@@ -126,8 +125,6 @@ export default function Profile() {
         value={user?.[editingField]}
         onSave={handleSave}
       />
-
-      {/* Пуш уведомление */}
       <Toast />
     </div>
   );
