@@ -3,14 +3,13 @@ import Header from "./components/Header";
 import BottomNav from "./components/BottomNav";
 import SplashScreen from "./components/SplashScreen";
 
-import CatalogWithProducts from "./pages/CatalogWithProducts";
+import Catalog from "./pages/Catalog";
 import Cart from "./pages/Cart";
 import Profile from "./pages/Profile";
 import History from "./pages/History";
 
 import { tg } from "./services/telegram";
-
-// импортируем react-query
+import { getUserByTelegramId, updateUser } from "./services/api";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient();
@@ -21,6 +20,9 @@ export default function App() {
   const [telegramId, setTelegramId] = useState(null);
   const [headerPadding, setHeaderPadding] = useState("pt-40");
   const [headerSize, setHeaderSize] = useState("py-12");
+  const [user, setUser] = useState(null);
+  const [needPhone, setNeedPhone] = useState(false);
+  const [phoneInput, setPhoneInput] = useState("");
 
   useEffect(() => {
     tg.ready();
@@ -38,12 +40,31 @@ export default function App() {
     }
 
     if (tg.initDataUnsafe?.user?.id) {
-      setTelegramId(tg.initDataUnsafe.user.id);
+      const tId = tg.initDataUnsafe.user.id;
+      setTelegramId(tId);
+
+      getUserByTelegramId(tId).then((u) => {
+        setUser(u);
+        if (!u.phone_number) {
+          setNeedPhone(true);
+        }
+      });
     }
 
     const timer = setTimeout(() => setLoading(false), 1500);
     return () => clearTimeout(timer);
   }, []);
+
+  const handleSavePhone = async () => {
+    if (!phoneInput.trim()) return;
+    try {
+      const updated = await updateUser(user.id, { phone_number: phoneInput.replace(/\D/g, "") });
+      setUser(updated);
+      setNeedPhone(false);
+    } catch (err) {
+      console.error("Ошибка при сохранении номера:", err);
+    }
+  };
 
   if (loading) return <SplashScreen />;
 
@@ -53,11 +74,36 @@ export default function App() {
         <Header headerPadding={headerPadding} headerSize={headerSize} variant={activePage} />
 
         <div className={`max-w-6xl mx-auto p-6 space-y-8 ${headerPadding}`}>
-          {activePage === "catalog" && <CatalogWithProducts />}
-          {activePage === "cart" && <Cart />}
-          {activePage === "profile" && <Profile />}
-          {activePage === "history" && <History telegramId={telegramId} />}
+          {/* 👉 если номер не указан, показываем заглушку */}
+          {needPhone ? (
+            <div className="bg-white shadow-md rounded-xl p-6 text-center">
+              <h2 className="text-lg font-semibold text-gray-800 mb-4">
+                Введите номер телефона, чтобы пользоваться приложением
+              </h2>
+              <input
+                type="tel"
+                value={phoneInput}
+                onChange={(e) => setPhoneInput(e.target.value)}
+                placeholder="+998 XX XXX XX XX"
+                className="w-full border rounded-lg p-2 text-center mb-4"
+              />
+              <button
+                onClick={handleSavePhone}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg w-full"
+              >
+                Сохранить
+              </button>
+            </div>
+          ) : (
+            <>
+              {activePage === "catalog" && <Catalog />}
+              {activePage === "cart" && <Cart />}
+              {activePage === "profile" && <Profile />}
+              {activePage === "history" && <History telegramId={telegramId} />}
+            </>
+          )}
         </div>
+
         <BottomNav active={activePage} setActive={setActivePage} />
       </div>
     </QueryClientProvider>
