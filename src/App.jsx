@@ -135,7 +135,7 @@ export default function App() {
         <div className={`max-w-6xl mx-auto p-6 space-y-8 ${headerPadding}`}>
           {activePage === "catalog" && <CatalogWithProducts />}
           {activePage === "cart" && <Cart />}
-          {activePage === "profile" && <Profile />}
+          {activePage === "profile" && <Profile user={user} setUser={setUser} />}
           {activePage === "history" && <History telegramId={telegramId} />}
         </div>
 
