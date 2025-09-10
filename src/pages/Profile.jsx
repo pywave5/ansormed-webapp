@@ -6,7 +6,6 @@ import { useHaptic } from "../hooks/useHaptic";
 import { useToast } from "../hooks/useToast";
 
 export default function Profile({ user, setUser}) {
-  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [editingField, setEditingField] = useState(null);
   const haptic = useHaptic();
