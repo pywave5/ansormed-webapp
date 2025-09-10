@@ -61,21 +61,22 @@ export default function App() {
   }, []);
 
   const handleSavePhone = async (newValue) => {
-    if (!user) return;
-    const cleanValue = newValue.replace(/\D/g, "");
+  if (!user) return;
+  const cleanValue = newValue.replace(/\D/g, "");
 
-    haptic.light();
-    try {
-      const updated = await updateUser(user.id, { ...user, phone_number: cleanValue });
-      setUser(updated);
-      haptic.success();
-      showToast("Ваш номер успешно сохранён!");
-    } catch (err) {
-      console.error("Ошибка при сохранении номера:", err);
-      haptic.error();
-      showToast("❌ Ошибка при сохранении");
-    }
-  };
+  haptic.light();
+  try {
+    const updated = await updateUser(user.id, { ...user, phone_number: cleanValue });
+    setUser(updated);
+    setEditingPhone(false); // 👉 сразу закрываем модалку
+    haptic.success();
+    showToast("Ваш номер успешно сохранён!");
+  } catch (err) {
+    console.error("Ошибка при сохранении номера:", err);
+    haptic.error();
+    showToast("❌ Ошибка при сохранении");
+  }
+};
 
   if (loading) return <SplashScreen />;
 
