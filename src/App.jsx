@@ -33,18 +33,6 @@ export default function App() {
 
   useEffect(() => {
   tg.ready();
-  const debugDiv = document.createElement("div");
-  debugDiv.style.position = "fixed";
-  debugDiv.style.bottom = "10px";
-  debugDiv.style.left = "10px";
-  debugDiv.style.zIndex = "9999";
-  debugDiv.style.background = "rgba(0,0,0,0.7)";
-  debugDiv.style.color = "white";
-  debugDiv.style.padding = "8px";
-  debugDiv.style.borderRadius = "8px";
-  debugDiv.innerText = "initData: " + (tg.initData || "EMPTY") +
-    "\nuser.id: " + (tg.initDataUnsafe?.user?.id || "NONE");
-  document.body.appendChild(debugDiv);
   tg.disableVerticalSwipes();
 
   if (tg.platform === "android" || tg.platform === "ios") {
@@ -68,16 +56,6 @@ export default function App() {
         // ⚡️ Реальный сценарий
         const data = await authWithTelegram(tg.initData);
         setUser(data);
-      } else {
-        // 🧪 Тестовый режим (браузер)
-        const fakeUser = {
-          id: 1,
-          name: "Тестовый Пользователь",
-          phone_number: null,
-          email: "test@example.com",
-          birth_date: "2000-01-01",
-        };
-        setUser(fakeUser);
       }
     } catch (err) {
       // ❌ Ошибку показываем прямо в UI
