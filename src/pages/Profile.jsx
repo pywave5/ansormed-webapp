@@ -1,12 +1,10 @@
-import { useEffect, useState } from "react";
-import { getUserByTelegramId, updateUser } from "../services/api";
-import { tg } from "../services/telegram";
+import { useState } from "react";
+import { updateUser } from "../services/api";
 import EditModal from "../components/EditModal";
 import { useHaptic } from "../hooks/useHaptic";
 import { useToast } from "../hooks/useToast";
 
-export default function Profile({ user, setUser}) {
-  const [loading, setLoading] = useState(true);
+export default function Profile({ user, setUser }) {
   const [editingField, setEditingField] = useState(null);
   const haptic = useHaptic();
   const { showToast, Toast } = useToast();
@@ -53,7 +51,7 @@ export default function Profile({ user, setUser}) {
       const updated = await updateUser(user.id, { ...user, [field]: cleanValue });
       setUser(updated);
 
-      haptic.success(); 
+      haptic.success();
       showToast("Ваши данные успешно изменены.", "success");
     } catch (err) {
       console.error("Ошибка при обновлении:", err);
@@ -61,10 +59,6 @@ export default function Profile({ user, setUser}) {
       showToast("Ошибка при сохранении", "error");
     }
   };
-
-  if (loading) {
-    return <div className="text-center text-gray-500">Загрузка...</div>;
-  }
 
   if (!user) {
     return <div className="text-center text-gray-500">Нет данных о пользователе</div>;
@@ -75,11 +69,7 @@ export default function Profile({ user, setUser}) {
       <h2 className="text-center text-lg font-semibold text-gray-800">Личные данные</h2>
 
       <div className="bg-white shadow-md rounded-2xl p-4">
-        <ProfileField
-          label="Имя"
-          value={user.name}
-          onClick={() => setEditingField("name")}
-        />
+        <ProfileField label="Имя" value={user.name} onClick={() => setEditingField("name")} />
         <ProfileField
           label="Номер телефона"
           value={formatPhone(user.phone_number)}
@@ -90,11 +80,7 @@ export default function Profile({ user, setUser}) {
           value={user.birth_date ? new Date(user.birth_date).toLocaleDateString("ru-RU") : ""}
           onClick={() => setEditingField("birth_date")}
         />
-        <ProfileField
-          label="E-mail"
-          value={user.email}
-          onClick={() => setEditingField("email")}
-        />
+        <ProfileField label="E-mail" value={user.email} onClick={() => setEditingField("email")} />
       </div>
 
       <EditModal
