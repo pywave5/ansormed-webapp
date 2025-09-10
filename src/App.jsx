@@ -32,25 +32,25 @@ export default function App() {
   const { showToast, Toast } = useToast();
 
   useEffect(() => {
-    tg.ready();
-    tg.disableVerticalSwipes();
+  tg.ready();
+  tg.disableVerticalSwipes();
 
-    if (tg.platform === "android" || tg.platform === "ios") {
-      tg.expand();
-      tg.requestFullscreen?.();
-      setHeaderPadding("pt-24");
-      setHeaderSize("py-12");
-    } else {
-      tg.exitFullscreen?.();
-      setHeaderPadding("pt-6");
-      setHeaderSize("py-2");
-    }
+  if (tg.platform === "android" || tg.platform === "ios") {
+    tg.expand();
+    tg.requestFullscreen?.();
+    setHeaderPadding("pt-24");
+    setHeaderSize("py-12");
+  } else {
+    tg.exitFullscreen?.();
+    setHeaderPadding("pt-6");
+    setHeaderSize("py-2");
+  }
 
-    if (tg.initDataUnsafe?.user?.id) {
-      setTelegramId(tg.initDataUnsafe.user.id);
-    }
+  if (tg.initDataUnsafe?.user?.id) {
+    setTelegramId(tg.initDataUnsafe.user.id);
+  }
 
-    async function fetchUser() {
+  async function fetchUser() {
     try {
       if (tg.initData) {
         const data = await authWithTelegram(tg.initData);
@@ -62,6 +62,9 @@ export default function App() {
       setLoading(false);
     }
   }
+
+  fetchUser()
+  }, []);
 
   const handleSavePhone = async (arg1, arg2) => {
     const newValue = typeof arg2 !== "undefined" ? arg2 : arg1;
