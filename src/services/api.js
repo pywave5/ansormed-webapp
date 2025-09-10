@@ -16,9 +16,9 @@ const api = axios.create({
 });
 
 // --- авторизация через Telegram ---
-export async function authWithTelegram(authData) {
+export async function authWithTelegram(initDataString) {
   try {
-    const res = await api.post("/auth/telegram/", { auth_data: authData });
+    const res = await api.post("/auth/telegram/", { auth_data: initDataString });
     return res.data;
   } catch (err) {
     console.error("❌ Ошибка авторизации Telegram:", err.response?.data || err.message);

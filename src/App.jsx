@@ -52,21 +52,19 @@ export default function App() {
 
   async function fetchUser() {
     try {
-      if (tg.initData && tg.initData.length > 0) {
-        // ⚡️ Реальный сценарий
-        const data = await authWithTelegram(tg.initData);
+      if (tg.initData) {
+        const data = await authWithTelegram(tg.initData); // <- send raw string
         setUser(data);
+      } else {
+        // fallback: если нет initData, можно попробовать tg.initDataUnsafe.id (но это небезопасно)
       }
     } catch (err) {
-      // ❌ Ошибку показываем прямо в UI
-      setUser(null);
-      alert("Ошибка авторизации: " + JSON.stringify(err.response?.data || err.message));
+      console.error("Ошибка авторизации:", err);
     } finally {
       setLoading(false);
     }
   }
-
-  fetchUser()
+  fetchUser();
   }, []);
 
   const handleSavePhone = async (arg1, arg2) => {
