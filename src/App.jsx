@@ -55,9 +55,10 @@ export default function App() {
       if (tg.initData) {
         const data = await authWithTelegram(tg.initData);
         setUser(data);
+        alert("Получен юзер: " + JSON.stringify(data));
       }
     } catch (err) {
-      console.error("Ошибка авторизации:", err);
+      alert("Ошибка авторизации: " + (err.response?.data || err.message));
     } finally {
       setLoading(false);
     }
