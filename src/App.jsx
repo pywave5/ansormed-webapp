@@ -52,12 +52,24 @@ export default function App() {
 
   async function fetchUser() {
     try {
-      if (tg.initData) {
+      if (tg.initData && tg.initData.length > 0) {
+        // ⚡️ Реальный сценарий
         const data = await authWithTelegram(tg.initData);
         setUser(data);
-        alert("Получен юзер: " + JSON.stringify(data));
+      } else {
+        // 🧪 Тестовый режим (браузер)
+        const fakeUser = {
+          id: 1,
+          name: "Тестовый Пользователь",
+          phone_number: null,
+          email: "test@example.com",
+          birth_date: "2000-01-01",
+        };
+        setUser(fakeUser);
       }
     } catch (err) {
+      // ❌ Ошибку показываем прямо в UI
+      setUser(null);
       alert("Ошибка авторизации: " + JSON.stringify(err.response?.data || err.message));
     } finally {
       setLoading(false);
