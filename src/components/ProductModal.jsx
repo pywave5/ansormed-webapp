@@ -84,7 +84,11 @@ export default function ProductModal({ product, onClose }) {
           )}
         </p>
         {/* Размер */}
-        <p className="text-blue-600 mb-4">{product.size} см</p>
+        {product.size && (
+          <p className="text-blue-600 mb-4">
+            Размер {product.size} см
+          </p>
+        )}
 
         {/* Описание */}
         <p className="text-gray-600 mb-4">{product.description}</p>
