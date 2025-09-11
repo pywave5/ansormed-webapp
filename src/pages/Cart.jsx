@@ -42,8 +42,8 @@ export default function Cart() {
     <div className="p-4 max-w-2xl mx-auto relative">
       {/* Всплывающее окно снизу */}
       {orderPlaced && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40">
-          <div className="w-full max-w-md bg-white rounded-t-2xl p-6 shadow-lg transition-transform duration-300 translate-y-0">
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50">
+          <div className="w-full bg-white rounded-t-2xl p-6 shadow-lg">
             <div className="flex flex-col items-center">
               <CheckCircle2 className="w-16 h-16 text-green-500 mb-4" />
               <p className="text-lg font-semibold text-gray-900 mb-4 text-center">
