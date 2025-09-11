@@ -216,6 +216,9 @@ const CategorySection = React.forwardRef(({ category, onProductClick }, ref) => 
                 <h3 className="font-medium text-gray-900 text-sm truncate">
                   {p.title}
                 </h3>
+                {p.size && (
+                  <p className="text-gray-500 text-xs mt-1">{p.size}</p>
+                )}
                 <div className="mt-1">
                   {p.discount > 0 ? (
                     <>
