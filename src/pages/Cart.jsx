@@ -49,6 +49,7 @@ export default function Cart() {
           <div className="bg-white rounded-2xl p-6 flex flex-col items-center shadow-lg">
             <CheckCircle2 className="w-16 h-16 text-green-500 mb-4" />
             <p className="text-lg font-semibold text-gray-900">
+              (логика Payme не реализована) <br />
               Ваш заказ оформлен!
             </p>
           </div>
