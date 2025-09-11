@@ -3,13 +3,11 @@ import { useCart } from "../hooks/useCart";
 import { Trash2, CheckCircle2 } from "lucide-react";
 import emptyCart from "../media/empty-cart.png";
 import { useHaptic } from "../hooks/useHaptic";
-import { useNavigate } from "react-router-dom";
 
 export default function Cart() {
   const { cart, removeFromCart, clearCart } = useCart();
   const { tap } = useHaptic();
   const [orderPlaced, setOrderPlaced] = useState(false);
-  const navigate = useNavigate();
 
   const handleOrder = () => {
     tap();
@@ -19,8 +17,7 @@ export default function Cart() {
 
   const handleConfirm = () => {
     tap();
-    setOrderPlaced(false);
-    navigate("/catalog"); // после OK уводим в каталог
+    setOrderPlaced(false); // возвращаемся к пустой корзине
   };
 
   if (orderPlaced) {
@@ -31,7 +28,7 @@ export default function Cart() {
           Ваш заказ оформлен!
         </h2>
         <p className="text-gray-600 mb-6">
-          Оплата через Payme <br /> Мы скоро с вами свяжемся.
+          Логика Payme. <br /> Мы скоро с вами свяжемся.
         </p>
         <button
           onClick={handleConfirm}
