@@ -1,69 +1,59 @@
 import { useEffect, useRef, useState } from "react";
+import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import { getCategories, getProducts } from "../services/api";
 import { useHaptic } from "../hooks/useHaptic";
 import ProductModal from "../components/ProductModal";
 
 export default function CategoriesWithProducts() {
-  const [categories, setCategories] = useState([]);
+  const { tap } = useHaptic();
+  const [headerHeight, setHeaderHeight] = useState(0);
   const [activeCategory, setActiveCategory] = useState(null);
-  const [productsByCategory, setProductsByCategory] = useState({});
-  const [pagesByCategory, setPagesByCategory] = useState({});
-  const [hasNextByCategory, setHasNextByCategory] = useState({});
-  const [loading, setLoading] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   const sectionRefs = useRef({});
   const buttonRefs = useRef({});
-  const [headerHeight, setHeaderHeight] = useState(0);
-  const { tap } = useHaptic();
-  const [selectedProduct, setSelectedProduct] = useState(null);
 
-  // Загружаем категории
-  useEffect(() => {
-    getCategories()
-      .then((data) => {
-        setCategories(data);
-        if (data.length > 0) setActiveCategory(data[0].id);
-      })
-      .catch((err) => console.error("Ошибка категорий:", err));
-  }, []);
-
-  // Загружаем первую страницу товаров по категориям
-  useEffect(() => {
-    const fetchAll = async () => {
-      const newProducts = {};
-      const newPages = {};
-      const newHasNext = {};
-      for (let cat of categories) {
-        try {
-          const data = await getProducts(cat.id, 1);
-          newProducts[cat.id] = data.results || [];
-          newPages[cat.id] = 1;
-          newHasNext[cat.id] = Boolean(data.next);
-        } catch (err) {
-          newProducts[cat.id] = [];
-          newPages[cat.id] = 1;
-          newHasNext[cat.id] = false;
-        }
+  // 📌 Загружаем категории
+  const {
+    data: categories = [],
+    isLoading: categoriesLoading,
+  } = useQuery({
+    queryKey: ["categories"],
+    queryFn: getCategories,
+    staleTime: 5 * 60 * 1000, // 5 минут кэш
+    onSuccess: (data) => {
+      if (data.length > 0 && !activeCategory) {
+        setActiveCategory(data[0].id);
       }
-      setProductsByCategory(newProducts);
-      setPagesByCategory(newPages);
-      setHasNextByCategory(newHasNext);
-    };
-    if (categories.length > 0) fetchAll();
-  }, [categories]);
+    },
+  });
+
+  // 📌 Для каждой категории — отдельный Infinite Query
+  const productQueries = categories.reduce((acc, cat) => {
+    acc[cat.id] = useInfiniteQuery({
+      queryKey: ["products", cat.id],
+      queryFn: ({ pageParam = 1 }) => getProducts(cat.id, pageParam),
+      getNextPageParam: (lastPage, allPages) =>
+        lastPage.next ? allPages.length + 1 : undefined,
+      staleTime: 2 * 60 * 1000, // кэш на 2 минуты
+    });
+    return acc;
+  }, {});
 
   // вычисляем высоту header
   useEffect(() => {
     const header = document.querySelector("header");
     if (header) setHeaderHeight(header.offsetHeight);
+
     const handleResize = () => {
       if (header) setHeaderHeight(header.offsetHeight);
     };
+
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // отслеживаем какая категория сейчас на экране
+  // отслеживаем какая категория на экране
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -99,43 +89,22 @@ export default function CategoriesWithProducts() {
   // lazy load: догружаем товары при скролле вниз
   useEffect(() => {
     const handleScroll = () => {
-      if (loading) return;
+      if (!activeCategory) return;
+      const query = productQueries[activeCategory];
+      if (!query) return;
 
-      const bottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 300;
-      if (bottom) {
-        const current = activeCategory;
-        if (current && hasNextByCategory[current]) {
-          fetchMore(current);
-        }
+      const bottom =
+        window.innerHeight + window.scrollY >=
+        document.body.offsetHeight - 300;
+
+      if (bottom && query.hasNextPage && !query.isFetchingNextPage) {
+        query.fetchNextPage();
       }
     };
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [activeCategory, productsByCategory, hasNextByCategory, pagesByCategory, loading]);
-
-  const fetchMore = async (catId) => {
-    if (loading) return;
-    setLoading(true);
-    try {
-      const nextPage = pagesByCategory[catId] + 1;
-      const data = await getProducts(catId, nextPage);
-
-      setProductsByCategory((prev) => ({
-        ...prev,
-        [catId]: [...(prev[catId] || []), ...(data.results || [])],
-      }));
-      setPagesByCategory((prev) => ({ ...prev, [catId]: nextPage }));
-      setHasNextByCategory((prev) => ({
-        ...prev,
-        [catId]: Boolean(data.next),
-      }));
-    } catch (err) {
-      console.error("Ошибка подгрузки:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [activeCategory, productQueries]);
 
   const scrollToCategory = (id) => {
     const section = sectionRefs.current[id];
@@ -173,75 +142,81 @@ export default function CategoriesWithProducts() {
 
       {/* Секции товаров */}
       <div className="p-3">
-        {categories.map((c) => (
-          <section
-            key={c.id}
-            ref={(el) => (sectionRefs.current[c.id] = el)}
-            data-id={c.id}
-            className="mb-10 pt-12"
-          >
-            {/* Заголовок категории */}
-            {productsByCategory[c.id] && productsByCategory[c.id].length > 0 && (
-              <h1 className="text-gray-900 font-bold mb-3">{c.name}</h1>
-            )}
+        {categories.map((c) => {
+          const query = productQueries[c.id];
+          const products =
+            query?.data?.pages.flatMap((page) => page.results) || [];
 
-            {productsByCategory[c.id] && productsByCategory[c.id].length > 0 ? (
-              <div className="grid grid-cols-2 gap-4">
-                {productsByCategory[c.id].map((p) => (
-                  <div
-                    key={p.id}
-                    onClick={() => {
-                      tap();
-                      setSelectedProduct(p);
-                    }}
-                    className="bg-white rounded-xl shadow-md hover:shadow-xl transition cursor-pointer overflow-hidden relative"
-                  >
-                    {p.discount > 0 && (
-                      <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow">
-                        -{p.discount}%
-                      </span>
-                    )}
-                    {p.image && (
-                      <figure className="bg-gray-50 flex justify-center">
-                        <img
-                          src={p.image}
-                          alt={p.title}
-                          className="h-24 object-contain"
-                        />
-                      </figure>
-                    )}
-                    <div className="p-3 text-center">
-                      <h3 className="font-medium text-gray-900 text-sm truncate">
-                        {p.title}
-                      </h3>
-                      <div className="mt-1">
-                        {p.discount > 0 ? (
-                          <>
-                            <span className="text-gray-400 line-through text-xs block">
+          return (
+            <section
+              key={c.id}
+              ref={(el) => (sectionRefs.current[c.id] = el)}
+              data-id={c.id}
+              className="mb-10 pt-12"
+            >
+              {/* Заголовок категории */}
+              {products.length > 0 && (
+                <h1 className="text-gray-900 font-bold mb-3">{c.name}</h1>
+              )}
+
+              {query?.isLoading ? (
+                <p className="text-gray-400">Загрузка...</p>
+              ) : products.length > 0 ? (
+                <div className="grid grid-cols-2 gap-4">
+                  {products.map((p) => (
+                    <div
+                      key={p.id}
+                      onClick={() => {
+                        tap();
+                        setSelectedProduct(p);
+                      }}
+                      className="bg-white rounded-xl shadow-md hover:shadow-xl transition cursor-pointer overflow-hidden relative"
+                    >
+                      {p.discount > 0 && (
+                        <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow">
+                          -{p.discount}%
+                        </span>
+                      )}
+                      {p.image && (
+                        <figure className="bg-gray-50 flex justify-center">
+                          <img
+                            src={p.image}
+                            alt={p.title}
+                            className="h-24 object-contain"
+                          />
+                        </figure>
+                      )}
+                      <div className="p-3 text-center">
+                        <h3 className="font-medium text-gray-900 text-sm truncate">
+                          {p.title}
+                        </h3>
+                        <div className="mt-1">
+                          {p.discount > 0 ? (
+                            <>
+                              <span className="text-gray-400 line-through text-xs block">
+                                {p.price.toLocaleString()} сум
+                              </span>
+                              <span className="font-bold text-red-600 text-sm block">
+                                {p.final_price.toLocaleString()} сум
+                              </span>
+                            </>
+                          ) : (
+                            <span className="font-bold text-green-600 text-sm block">
                               {p.price.toLocaleString()} сум
                             </span>
-                            <span className="font-bold text-red-600 text-sm block">
-                              {p.final_price.toLocaleString()} сум
-                            </span>
-                          </>
-                        ) : (
-                          <span className="font-bold text-green-600 text-sm block">
-                            {p.price.toLocaleString()} сум
-                          </span>
-                        )}
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            ) : productsByCategory[c.id] ? (
-              <p className="text-gray-400">Нет товаров</p>
-            ) : null}
-          </section>
-        ))}
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-400">Нет товаров</p>
+              )}
+            </section>
+          );
+        })}
       </div>
-
-      {loading && <p className="text-center py-4">Загрузка...</p>}
 
       {selectedProduct && (
         <ProductModal
