@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { getCategories, getProducts } from "../services/api";
 import { useHaptic } from "../hooks/useHaptic";
 import ProductModal from "../components/ProductModal";
@@ -149,9 +149,13 @@ const CategorySection = React.forwardRef(({ category, onProductClick }, ref) => 
     queryKey: ["products", category.id],
     queryFn: ({ pageParam = 1 }) => getProducts(category.id, pageParam),
     getNextPageParam: (lastPage) => {
-      if (lastPage.next) {
-        const url = new URL(lastPage.next);
-        return parseInt(url.searchParams.get("page") || "0");
+      if (lastPage?.next) {
+        try {
+          const url = new URL(lastPage.next);
+          return parseInt(url.searchParams.get("page") || "0");
+        } catch {
+          return undefined;
+        }
       }
       return undefined;
     },
@@ -175,7 +179,7 @@ const CategorySection = React.forwardRef(({ category, onProductClick }, ref) => 
     return () => observer.disconnect();
   }, [hasNextPage, fetchNextPage]);
 
-  const products = data?.pages.flatMap((p) => p.results) || [];
+  const products = data?.pages.flatMap((p) => p.results || p) || [];
 
   return (
     <section ref={ref} data-id={category.id} className="mb-10 pt-12">
