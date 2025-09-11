@@ -87,7 +87,7 @@ export default function CategoriesWithProducts() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center py-6 text-gray-500">
+      <div className="flex flex-col items-center justify-center py-6 mt-10 text-gray-500">
         <Loader2 className="w-6 h-6 mb-2 animate-spin" />
         <span>Загрузка категорий...</span>
       </div>
@@ -96,7 +96,7 @@ export default function CategoriesWithProducts() {
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center py-6 text-red-500">
+      <div className="flex flex-col items-center justify-center py-6 mt-10 text-red-500">
         <AlertTriangle className="w-6 h-6 mb-2" />
         <span>Ошибка загрузки</span>
       </div>
