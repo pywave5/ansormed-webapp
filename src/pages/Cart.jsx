@@ -1,11 +1,13 @@
+import { useState } from "react";
 import { useCart } from "../hooks/useCart";
-import { Trash2 } from "lucide-react";
+import { Trash2, CheckCircle2 } from "lucide-react";
 import emptyCart from "../media/empty-cart.png";
 import { useHaptic } from "../hooks/useHaptic";
 
 export default function Cart() {
   const { cart, removeFromCart, clearCart } = useCart();
   const { tap } = useHaptic();
+  const [orderPlaced, setOrderPlaced] = useState(false);
 
   if (!cart || cart.length === 0) {
     return (
@@ -30,9 +32,32 @@ export default function Cart() {
     0
   );
 
+  const handleOrder = () => {
+    tap();
+    clearCart();
+    setOrderPlaced(true);
+
+    // убираем сообщение через 2.5 секунды
+    setTimeout(() => setOrderPlaced(false), 2500);
+  };
+
   return (
-    <div className="p-4 max-w-2xl mx-auto">
-      <h1 className="text-xl sm:text-2xl mb-4 font-bold text-gray-900">Корзина</h1>
+    <div className="p-4 max-w-2xl mx-auto relative">
+      {/* Сообщение об успешном заказе */}
+      {orderPlaced && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
+          <div className="bg-white rounded-2xl p-6 flex flex-col items-center shadow-lg">
+            <CheckCircle2 className="w-16 h-16 text-green-500 mb-4" />
+            <p className="text-lg font-semibold text-gray-900">
+              Ваш заказ оформлен!
+            </p>
+          </div>
+        </div>
+      )}
+
+      <h1 className="text-xl sm:text-2xl mb-4 font-bold text-gray-900">
+        Корзина
+      </h1>
 
       <ul className="space-y-3">
         {cart.map((item) => (
@@ -89,10 +114,7 @@ export default function Cart() {
       </div>
 
       <button
-        onClick={() => {
-          tap();
-          clearCart();
-        }}
+        onClick={handleOrder}
         className="mt-6 w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition text-sm sm:text-base"
       >
         Оформить заказ
