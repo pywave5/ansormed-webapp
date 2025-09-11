@@ -41,7 +41,7 @@ export default function Cart() {
         </p>
         <button
           onClick={handleConfirm}
-          className="bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-700 transition"
+          className="w-full mt-6 bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition"
         >
           ОК
         </button>
