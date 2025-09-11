@@ -16,14 +16,42 @@ export default function Cart() {
 
   const handleOrder = () => {
     tap();
-    setOrderPlaced(true); // показываем модалку
+    setOrderPlaced(true); // показываем страницу заказа
   };
 
   const handleConfirm = () => {
-    clearCart(); // очищаем корзину только при нажатии ОК
+    tap();
+    clearCart();
     setOrderPlaced(false);
+    // тут можно сделать redirect, например: navigate("/catalog")
   };
 
+  // --------------------------
+  // Страница после заказа
+  // --------------------------
+  if (orderPlaced) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[80vh] p-6 text-center">
+        <CheckCircle2 className="w-20 h-20 text-green-500 mb-6" />
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">
+          Ваш заказ оформлен!
+        </h2>
+        <p className="text-gray-600 mb-6">
+          Логика Payme (пока не реализована) <br /> Мы скоро с вами свяжемся.
+        </p>
+        <button
+          onClick={handleConfirm}
+          className="bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-700 transition"
+        >
+          ОК
+        </button>
+      </div>
+    );
+  }
+
+  // --------------------------
+  // Пустая корзина
+  // --------------------------
   if (!cart || cart.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[70vh] text-gray-700 p-4">
@@ -42,28 +70,11 @@ export default function Cart() {
     );
   }
 
+  // --------------------------
+  // Основная корзина
+  // --------------------------
   return (
-    <div className="p-4 max-w-2xl mx-auto relative">
-      {/* Всплывающее окно снизу */}
-      {orderPlaced && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50">
-          <div className="w-full max-w-md bg-white rounded-t-2xl p-6 shadow-lg">
-            <div className="flex flex-col items-center">
-              <CheckCircle2 className="w-16 h-16 text-green-500 mb-4" />
-              <p className="text-lg font-semibold text-gray-900 mb-4 text-center">
-                Ваш заказ оформлен!
-              </p>
-              <button
-                onClick={handleConfirm}
-                className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition"
-              >
-                ОК
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
+    <div className="p-4 max-w-2xl mx-auto">
       <h1 className="text-xl sm:text-2xl mb-4 font-bold text-gray-900">
         Корзина
       </h1>
