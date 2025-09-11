@@ -3,32 +3,26 @@ import { useCart } from "../hooks/useCart";
 import { Trash2, CheckCircle2 } from "lucide-react";
 import emptyCart from "../media/empty-cart.png";
 import { useHaptic } from "../hooks/useHaptic";
+import { useNavigate } from "react-router-dom";
 
 export default function Cart() {
   const { cart, removeFromCart, clearCart } = useCart();
   const { tap } = useHaptic();
   const [orderPlaced, setOrderPlaced] = useState(false);
-
-  const totalCost = cart.reduce(
-    (sum, item) => sum + item.quantity * (item.final_price || 0),
-    0
-  );
+  const navigate = useNavigate();
 
   const handleOrder = () => {
     tap();
-    setOrderPlaced(true); // показываем страницу заказа
+    clearCart();         // сразу очищаем корзину
+    setOrderPlaced(true); // показываем экран подтверждения
   };
 
   const handleConfirm = () => {
     tap();
-    clearCart();
     setOrderPlaced(false);
-    // тут можно сделать redirect, например: navigate("/catalog")
+    navigate("/catalog"); // после OK уводим в каталог
   };
 
-  // --------------------------
-  // Страница после заказа
-  // --------------------------
   if (orderPlaced) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[80vh] p-6 text-center">
@@ -37,11 +31,11 @@ export default function Cart() {
           Ваш заказ оформлен!
         </h2>
         <p className="text-gray-600 mb-6">
-          Логика Payme (пока не реализована) <br /> Мы скоро с вами свяжемся.
+          Оплата через Payme <br /> Мы скоро с вами свяжемся.
         </p>
         <button
           onClick={handleConfirm}
-          className="w-full mt-6 bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition"
+          className="w-full mt-auto bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition"
         >
           ОК
         </button>
@@ -49,9 +43,6 @@ export default function Cart() {
     );
   }
 
-  // --------------------------
-  // Пустая корзина
-  // --------------------------
   if (!cart || cart.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[70vh] text-gray-700 p-4">
@@ -70,9 +61,11 @@ export default function Cart() {
     );
   }
 
-  // --------------------------
-  // Основная корзина
-  // --------------------------
+  const totalCost = cart.reduce(
+    (sum, item) => sum + item.quantity * (item.final_price || 0),
+    0
+  );
+
   return (
     <div className="p-4 max-w-2xl mx-auto">
       <h1 className="text-xl sm:text-2xl mb-4 font-bold text-gray-900">
