@@ -42,26 +42,38 @@ export default function CategoriesWithProducts() {
 
   // отслеживаем какая категория сейчас на экране
   useEffect(() => {
-    if (!categories.length) return;
+  if (!categories.length) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries.find((e) => e.isIntersecting);
-        if (visible) {
-          setActiveCategory(parseInt(visible.target.dataset.id));
+  const observer = new IntersectionObserver(
+    (entries) => {
+      let mostVisible = null;
+
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          if (
+            !mostVisible ||
+            entry.intersectionRatio > mostVisible.intersectionRatio
+          ) {
+            mostVisible = entry;
+          }
         }
-      },
-      {
-        rootMargin: `-${headerHeight + 50}px 0px -70% 0px`,
-        threshold: 0,
       }
-    );
 
-    Object.values(sectionRefs.current).forEach((el) =>
-      el ? observer.observe(el) : null
-    );
+      if (mostVisible) {
+        setActiveCategory(parseInt(mostVisible.target.dataset.id));
+      }
+    },
+    {
+      rootMargin: `-${headerHeight + 50}px 0px -50% 0px`, // смещение чуть мягче
+      threshold: [0.25, 0.5, 0.75, 1], // несколько порогов
+    }
+  );
 
-    return () => observer.disconnect();
+  Object.values(sectionRefs.current).forEach((el) =>
+    el ? observer.observe(el) : null
+  );
+
+  return () => observer.disconnect();
   }, [categories, headerHeight]);
 
   // скроллим категории так, чтобы активная была по центру
