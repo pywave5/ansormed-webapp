@@ -1,126 +1,129 @@
 import { useState } from "react";
-import { updateUser } from "../services/api";
-import EditModal from "../components/EditModal";
+import { useCart } from "../hooks/useCart";
+import { Trash2, CheckCircle2 } from "lucide-react";
+import emptyCart from "../media/empty-cart.png";
 import { useHaptic } from "../hooks/useHaptic";
-import { useToast } from "../hooks/useToast";
 
-export default function Profile({ user, setUser }) {
-  const [editingField, setEditingField] = useState(null);
-  const haptic = useHaptic();
-  const { showToast, Toast } = useToast();
+export default function Cart() {
+  const { cart, removeFromCart, clearCart } = useCart();
+  const { tap } = useHaptic();
+  const [orderPlaced, setOrderPlaced] = useState(false);
 
-  const formatPhone = (val) => {
-    if (!val) return "";
-    val = val.replace(/\D/g, "");
-    if (!val.startsWith("998")) {
-      if (val.startsWith("8")) {
-        val = "998" + val.slice(1);
-      } else {
-        val = "998" + val;
-      }
-    }
-    if (val.length > 12) val = val.slice(0, 12);
-
-    let formatted = "+998";
-    if (val.length > 3) formatted += " " + val.slice(3, 5);
-    if (val.length > 5) formatted += " " + val.slice(5, 8);
-    if (val.length > 8) formatted += " " + val.slice(8, 10);
-    if (val.length > 10) formatted += " " + val.slice(10, 12);
-
-    return formatted;
-  };
-
-  const handleSave = async (field, newValue) => {
-    if (!user) return;
-
-    let cleanValue = newValue;
-    if (field === "phone_number") {
-      cleanValue = newValue.replace(/\D/g, "");
-    }
-    if (field === "birth_date") {
-      const parts = newValue.split(".");
-      if (parts.length === 3) {
-        const [dd, mm, yyyy] = parts;
-        cleanValue = `${yyyy}-${mm}-${dd}`;
-      }
-    }
-
-    haptic.light();
-
-    try {
-      const updated = await updateUser(user.id, { ...user, [field]: cleanValue });
-      setUser(updated);
-
-      haptic.success();
-      showToast("Ваши данные успешно изменены.", "success");
-    } catch (err) {
-      console.error("Ошибка при обновлении:", err);
-      haptic.error();
-      showToast("Ошибка при сохранении", "error");
-    }
-  };
-
-  if (!user) {
-    return <div className="text-center text-gray-500">Нет данных о пользователе</div>;
+  if (!cart || cart.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[70vh] text-gray-700 p-4">
+        <img
+          src={emptyCart}
+          alt="Корзина пуста"
+          className="w-40 h-40 object-contain mb-6 opacity-80"
+        />
+        <h2 className="text-lg sm:text-xl font-semibold text-gray-900 text-center">
+          Ваша корзина пуста
+        </h2>
+        <p className="text-sm mt-2 text-gray-600 text-center">
+          Добавьте товары, чтобы оформить заказ
+        </p>
+      </div>
+    );
   }
 
-  return (
-    <div className="flex flex-col space-y-4">
-      <h2 className="text-center text-lg font-semibold text-gray-800">Личные данные</h2>
+  const totalCost = cart.reduce(
+    (sum, item) => sum + item.quantity * (item.final_price || 0),
+    0
+  );
 
-      <div className="bg-white shadow-md rounded-2xl p-4">
-        <ProfileField label="Имя" value={user.name} onClick={() => setEditingField("name")} />
-        <ProfileField
-          label="Номер телефона"
-          value={formatPhone(user.phone_number)}
-          onClick={() => setEditingField("phone_number")}
-        />
-        <ProfileField
-          label="Дата рождения"
-          value={user.birth_date ? new Date(user.birth_date).toLocaleDateString("ru-RU") : ""}
-          onClick={() => setEditingField("birth_date")}
-        />
-        <ProfileField label="E-mail" value={user.email} onClick={() => setEditingField("email")} />
+  const handleOrder = () => {
+    tap();
+    clearCart();
+    setOrderPlaced(true);
+  };
+
+  return (
+    <div className="p-4 max-w-2xl mx-auto relative">
+      {/* Всплывающее окно снизу */}
+      {orderPlaced && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center">
+          <div className="w-full bg-white rounded-t-2xl p-6 shadow-lg animate-slide-up">
+            <div className="flex flex-col items-center">
+              <CheckCircle2 className="w-16 h-16 text-green-500 mb-4" />
+              <p className="text-lg font-semibold text-gray-900 mb-4">
+                Ваш заказ оформлен!
+              </p>
+              <button
+                onClick={() => setOrderPlaced(false)}
+                className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition"
+              >
+                ОК
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <h1 className="text-xl sm:text-2xl mb-4 font-bold text-gray-900">
+        Корзина
+      </h1>
+
+      <ul className="space-y-3">
+        {cart.map((item) => (
+          <li
+            key={item.id}
+            className="flex items-center gap-3 bg-white border rounded-xl p-3 shadow-sm"
+          >
+            {item.image && (
+              <img
+                src={item.image}
+                alt={item.title || "Товар"}
+                className="w-14 h-14 sm:w-16 sm:h-16 object-cover rounded-lg border flex-shrink-0"
+              />
+            )}
+
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold text-gray-900 text-sm sm:text-base truncate">
+                {item.title || "Без названия"}
+              </p>
+              <p className="text-xs sm:text-sm text-gray-700">
+                {item.quantity || 1} шт ×{" "}
+                {item.final_price
+                  ? item.final_price.toLocaleString() + " сум"
+                  : "—"}
+                {item.discount > 0 && item.price && (
+                  <span className="line-through ml-2 text-gray-400">
+                    {item.price.toLocaleString()} сум
+                  </span>
+                )}
+              </p>
+            </div>
+
+            <div className="flex flex-col items-end gap-2 sm:flex-row sm:items-center sm:gap-3 flex-shrink-0">
+              <p className="font-bold text-green-600 text-sm sm:text-base whitespace-nowrap">
+                {(item.quantity * (item.final_price || 0)).toLocaleString()} сум
+              </p>
+              <button
+                onClick={() => {
+                  tap();
+                  removeFromCart(item.id);
+                }}
+                className="p-2 rounded-full hover:bg-red-100 transition flex-shrink-0"
+              >
+                <Trash2 className="w-4 h-4 sm:w-5 sm:h-5 text-red-500" />
+              </button>
+            </div>
+          </li>
+        ))}
+      </ul>
+
+      <div className="mt-6 flex justify-between font-bold text-base sm:text-lg text-gray-900 bg-gray-100 rounded-xl p-3">
+        <span>Итого:</span>
+        <span>{totalCost.toLocaleString()} сум</span>
       </div>
 
-      <EditModal
-        isOpen={!!editingField}
-        onClose={() => setEditingField(null)}
-        field={editingField}
-        label={
-          editingField === "name"
-            ? "Имя"
-            : editingField === "phone_number"
-            ? "Номер телефона"
-            : editingField === "birth_date"
-            ? "Дата рождения"
-            : "E-mail"
-        }
-        value={user?.[editingField]}
-        onSave={handleSave}
-      />
-      <Toast />
-    </div>
-  );
-}
-
-function ProfileField({ label, value, onClick }) {
-  const haptic = useHaptic();
-
-  return (
-    <div
-      className="flex justify-between items-center py-3 border-b border-gray-200 cursor-pointer"
-      onClick={() => {
-        haptic.light();
-        onClick();
-      }}
-    >
-      <span className="text-gray-700">{label}</span>
-      {value ? (
-        <span className="text-gray-900">{value}</span>
-      ) : (
-        <span className="text-blue-600 font-medium">Указать</span>
-      )}
+      <button
+        onClick={handleOrder}
+        className="mt-6 w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition text-sm sm:text-base"
+      >
+        Оформить заказ
+      </button>
     </div>
   );
 }
