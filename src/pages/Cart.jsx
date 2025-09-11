@@ -9,6 +9,21 @@ export default function Cart() {
   const { tap } = useHaptic();
   const [orderPlaced, setOrderPlaced] = useState(false);
 
+  const totalCost = cart.reduce(
+    (sum, item) => sum + item.quantity * (item.final_price || 0),
+    0
+  );
+
+  const handleOrder = () => {
+    tap();
+    setOrderPlaced(true); // показываем модалку
+  };
+
+  const handleConfirm = () => {
+    clearCart(); // очищаем корзину только при нажатии ОК
+    setOrderPlaced(false);
+  };
+
   if (!cart || cart.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[70vh] text-gray-700 p-4">
@@ -27,30 +42,19 @@ export default function Cart() {
     );
   }
 
-  const totalCost = cart.reduce(
-    (sum, item) => sum + item.quantity * (item.final_price || 0),
-    0
-  );
-
-  const handleOrder = () => {
-    tap();
-    clearCart();
-    setOrderPlaced(true);
-  };
-
   return (
     <div className="p-4 max-w-2xl mx-auto relative">
       {/* Всплывающее окно снизу */}
       {orderPlaced && (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50">
-          <div className="w-full bg-white rounded-t-2xl p-6 shadow-lg">
+          <div className="w-full max-w-md bg-white rounded-t-2xl p-6 shadow-lg">
             <div className="flex flex-col items-center">
               <CheckCircle2 className="w-16 h-16 text-green-500 mb-4" />
               <p className="text-lg font-semibold text-gray-900 mb-4 text-center">
                 Ваш заказ оформлен!
               </p>
               <button
-                onClick={() => setOrderPlaced(false)}
+                onClick={handleConfirm}
                 className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition"
               >
                 ОК
