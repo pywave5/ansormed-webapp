@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { updateUser } from "../services/api";
 import EditModal from "../components/EditModal";
+import { UserX } from "lucide-react";
 import { useHaptic } from "../hooks/useHaptic";
 import { useToast } from "../hooks/useToast";
 
@@ -61,7 +62,12 @@ export default function Profile({ user, setUser }) {
   };
 
   if (!user) {
-    return <div className="text-center text-gray-500">Нет данных о пользователе</div>;
+    return (
+      <div className="flex flex-col items-center justify-center text-gray-500 py-10">
+        <UserX className="w-12 h-12 mb-3 text-gray-400" />
+        <span className="text-center">Нет данных о пользователе</span>
+      </div>
+    );
   }
 
   return (
