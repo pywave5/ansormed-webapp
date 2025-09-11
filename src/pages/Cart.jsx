@@ -36,22 +36,27 @@ export default function Cart() {
     tap();
     clearCart();
     setOrderPlaced(true);
-
-    // убираем сообщение через 2.5 секунды
-    setTimeout(() => setOrderPlaced(false), 2500);
   };
 
   return (
     <div className="p-4 max-w-2xl mx-auto relative">
-      {/* Сообщение об успешном заказе */}
+      {/* Всплывающее окно снизу */}
       {orderPlaced && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
-          <div className="bg-white rounded-2xl p-6 flex flex-col items-center shadow-lg">
-            <CheckCircle2 className="w-16 h-16 text-green-500 mb-4" />
-            <p className="text-lg font-semibold text-gray-900">
-              (логика Payme не реализована) <br />
-              Ваш заказ оформлен!
-            </p>
+        <div className="fixed inset-0 z-50 flex items-end justify-center">
+          <div className="w-full bg-white rounded-t-2xl p-6 shadow-lg animate-slide-up">
+            <div className="flex flex-col items-center">
+              <CheckCircle2 className="w-16 h-16 text-green-500 mb-4" />
+              <p className="text-lg font-semibold text-gray-900 mb-4">
+                (логика Payme или другой системы оплаты здесь)
+                Ваш заказ оформлен!
+              </p>
+              <button
+                onClick={() => setOrderPlaced(false)}
+                className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition"
+              >
+                ОК
+              </button>
+            </div>
           </div>
         </div>
       )}
