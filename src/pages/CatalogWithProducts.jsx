@@ -3,6 +3,7 @@ import { getCategories, getProducts } from "../services/api";
 import { useHaptic } from "../hooks/useHaptic";
 import ProductModal from "../components/ProductModal";
 import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
+import { Loader2, AlertTriangle } from "lucide-react";
 
 export default function CategoriesWithProducts() {
   const { tap } = useHaptic();
@@ -84,8 +85,23 @@ export default function CategoriesWithProducts() {
     }
   };
 
-  if (isLoading) return <p className="text-center py-6">Загрузка категорий...</p>;
-  if (error) return <p className="text-center py-6 text-red-500">Ошибка загрузки</p>;
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-6 text-gray-500">
+        <Loader2 className="w-6 h-6 mb-2 animate-spin" />
+        <span>Загрузка категорий...</span>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center py-6 text-red-500">
+        <AlertTriangle className="w-6 h-6 mb-2" />
+        <span>Ошибка загрузки</span>
+      </div>
+    );
+  }
 
   return (
     <div>
