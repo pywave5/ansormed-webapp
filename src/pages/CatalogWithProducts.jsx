@@ -217,7 +217,10 @@ const CategorySection = React.forwardRef(({ category, onProductClick }, ref) => 
                   {p.title}
                 </h3>
                 {p.size && (
-                  <p className="text-gray-500 text-xs mt-1">{p.size}</p>
+                  <p className="text-xs mt-1 text-gray-600">
+                    <span className="text-gray-500">Размер:</span>{" "}
+                    <span className="font-medium text-blue-600">{p.size} см</span>
+                  </p>
                 )}
                 <div className="mt-1">
                   {p.discount > 0 ? (
