@@ -6,7 +6,7 @@ import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import { Loader2, AlertTriangle } from "lucide-react";
 
 export default function CategoriesWithProducts() {
-  const { tap } = useHaptic();
+  const { tap, error: hapticError } = useHaptic();
   const [selectedProduct, setSelectedProduct] = useState(null);
 
   // Загружаем категории
@@ -85,11 +85,17 @@ export default function CategoriesWithProducts() {
     }
   };
 
+  useEffect(() => {
+    if (error) {
+      hapticError();
+    }
+  }, [error, hapticError]);
+
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-6 mt-16 text-gray-500">
         <Loader2 className="w-6 h-6 mb-2 animate-spin" />
-        <span>Загрузка категорий...</span>
+        <span>Загрузка товаров...</span>
       </div>
     );
   }
@@ -99,6 +105,7 @@ export default function CategoriesWithProducts() {
       <div className="flex flex-col items-center justify-center py-6 mt-16 text-red-500">
         <AlertTriangle className="w-6 h-6 mb-2" />
         <span>Ошибка загрузки</span>
+        tap.error();
       </div>
     );
   }
