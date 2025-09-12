@@ -105,7 +105,6 @@ export default function CategoriesWithProducts() {
       <div className="flex flex-col items-center justify-center py-6 mt-16 text-red-500">
         <AlertTriangle className="w-6 h-6 mb-2" />
         <span>Ошибка загрузки</span>
-        tap.error();
       </div>
     );
   }
