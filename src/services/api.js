@@ -9,8 +9,7 @@ if (!API_URL) {
 
 // --- публичный API (фронт) ---
 export const apiPublic = axios.create({
-  baseURL: API_URL,
-  headers: { "ngrok-skip-browser-warning": "true" },
+  baseURL: API_URL
 });
 
 // --- приватный API (бот / сервисы) ---
