@@ -33,7 +33,6 @@ const attachAuthInterceptor = (instance) => {
   });
 };
 
-attachAuthInterceptor(apiPublic);
 attachAuthInterceptor(apiPrivate);
 
 //
