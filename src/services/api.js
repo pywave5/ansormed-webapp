@@ -7,7 +7,6 @@ if (!API_URL) {
   console.error("API_URL не задан в .env.local");
 }
 
-
 // --- публичный API ---
 export const apiPublic = axios.create({
   baseURL: API_URL,
