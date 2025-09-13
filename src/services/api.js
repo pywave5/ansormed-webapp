@@ -30,8 +30,6 @@ apiPrivate.interceptors.request.use((config) => {
   return config;
 });
 
-attachAuthInterceptor(apiPrivate);
-
 //
 // --- авторизация через Telegram (публичный) ---
 //
