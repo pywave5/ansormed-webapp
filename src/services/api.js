@@ -19,12 +19,26 @@ const api = axios.create({
 export async function authWithTelegram(initDataString) {
   try {
     const res = await api.post("/auth/telegram/", { auth_data: initDataString });
+
+    const { access, refresh } = res.data;
+    if (access) localStorage.setItem("access", access);
+    if (refresh) localStorage.setItem("refresh", refresh);
+
     return res.data;
   } catch (err) {
     console.error("❌ Ошибка авторизации Telegram:", err.response?.data || err.message);
     throw err;
   }
 }
+
+// Interceptor для токена
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("access");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
 // --- категории ---
 export const getCategories = async () => {
