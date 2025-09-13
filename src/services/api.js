@@ -89,7 +89,7 @@ export async function getAds() {
 //
 export async function getMyOrders(telegramId) {
   if (!telegramId) throw new Error("❌ telegramId обязателен для getMyOrders");
-  const res = await apiPublic.get(`/orders/me/?telegram_id=${telegramId}`);
+  const res = await apiPrivate.get(`/orders/me/?telegram_id=${telegramId}`);
   return res.data;
 }
 
