@@ -5,20 +5,13 @@ import { useHaptic } from "../hooks/useHaptic";
 export default function History({ telegramId }) {
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [error, setError] = useState(null);   // ⬅️ добавили state для ошибки
   const { tap } = useHaptic();
 
   useEffect(() => {
     if (telegramId) {
       getMyOrders(telegramId)
-        .then((data) => {
-          setOrders(data);
-          setError(null); // сбрасываем ошибку, если всё ок
-        })
-        .catch((err) => {
-          console.error("Ошибка загрузки заказов:", err);
-          setError("Не удалось загрузить историю заказов 😕"); // сообщение для UI
-        });
+        .then(setOrders)
+        .catch((err) => console.error("Ошибка загрузки заказов:", err));
     }
   }, [telegramId]);
 
@@ -37,15 +30,7 @@ export default function History({ telegramId }) {
   return (
     <div className="p-4">
       <h2 className="text-gray-800 text-xl font-bold mb-4">История заказов</h2>
-
-      {/* Ошибка */}
-      {error && (
-        <div className="bg-red-100 text-red-600 px-4 py-2 rounded-lg mb-4">
-          {error}
-        </div>
-      )}
-
-      {orders.length === 0 && !error ? (
+      {orders.length === 0 ? (
         <p className="text-gray-400">У вас пока нет заказов.</p>
       ) : (
         <div className="space-y-3">
@@ -71,15 +56,15 @@ export default function History({ telegramId }) {
         </div>
       )}
 
-      {/* модалка */}
+     {/* Модалка с деталями */}
       {selectedOrder && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-          onClick={() => setSelectedOrder(null)}
+          onClick={() => setSelectedOrder(null)} // клик по внешке
         >
           <div
             className="bg-white text-black rounded-xl p-6 w-96 max-h-[90vh] overflow-y-auto shadow-lg"
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => e.stopPropagation()} // блокируем закрытие при клике внутри
           >
             <h3 className="text-lg font-bold mb-3">
               Заказ №{selectedOrder.id}
@@ -92,6 +77,7 @@ export default function History({ telegramId }) {
               {formatPrice(selectedOrder.total_cost)}
             </p>
 
+            {/* Список товаров */}
             {selectedOrder.items && selectedOrder.items.length > 0 ? (
               <ul className="mt-4 space-y-3">
                 {selectedOrder.items.map((item) => (

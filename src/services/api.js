@@ -4,24 +4,23 @@ const API_URL = import.meta.env.VITE_API_URL;
 const API_SECRET_KEY = import.meta.env.VITE_API_SECRET_KEY;
 
 if (!API_URL) {
-  console.error("❌ API_URL не задан в .env.local");
+  console.error("API_URL не задан в .env.local");
 }
 
-// --- публичный API (фронт) ---
+// --- публичный API (без ключа) ---
 export const apiPublic = axios.create({
-  baseURL: API_URL
+  baseURL: API_URL,
 });
 
-// --- приватный API (бот / сервисы) ---
+// --- приватный API (JWT или X-API-KEY) ---
 export const apiPrivate = axios.create({
   baseURL: API_URL,
   headers: {
-    "X-API-KEY": API_SECRET_KEY,
-    "ngrok-skip-browser-warning": "true",
+    "X-API-KEY": API_SECRET_KEY
   },
 });
 
-// --- интерцептор для JWT (работает на обоих клиентах) ---
+// --- интерцептор для JWT ---
 const attachAuthInterceptor = (instance) => {
   instance.interceptors.request.use((config) => {
     const token = localStorage.getItem("access");
@@ -35,21 +34,16 @@ const attachAuthInterceptor = (instance) => {
 attachAuthInterceptor(apiPrivate);
 
 //
-// --- авторизация через Telegram ---
+// --- авторизация через Telegram (публичный) ---
 //
 export async function authWithTelegram(initDataString) {
-  try {
-    const res = await apiPublic.post("/auth/telegram/", { auth_data: initDataString });
+  const res = await apiPublic.post("/auth/telegram/", { auth_data: initDataString });
 
-    const { access, refresh } = res.data;
-    if (access) localStorage.setItem("access", access);
-    if (refresh) localStorage.setItem("refresh", refresh);
+  const { access, refresh } = res.data;
+  if (access) localStorage.setItem("access", access);
+  if (refresh) localStorage.setItem("refresh", refresh);
 
-    return res.data;
-  } catch (err) {
-    console.error("❌ Ошибка авторизации Telegram:", err.response?.data || err.message);
-    throw err;
-  }
+  return res.data;
 }
 
 //
@@ -84,19 +78,21 @@ export async function getAds() {
 }
 
 //
-// --- история заказов (нужен JWT) ---
+// --- история заказов (нужен JWT или X-API-KEY) ---
 //
 export async function getMyOrders(telegramId) {
   if (!telegramId) throw new Error("❌ telegramId обязателен для getMyOrders");
-  const res = await apiPublic.get(`/orders/me/?telegram_id=${telegramId}`);
+  const res = await apiPrivate.get(`/orders/me/`, {
+    params: { telegram_id: telegramId },
+  });
   return res.data;
 }
 
 //
-// --- корзина ---
+// --- корзина (приватный API) ---
 //
 export async function getUserCart(telegramId) {
-  const res = await apiPublic.get(`/orders/`, {
+  const res = await apiPrivate.get(`/orders/`, {
     params: { telegram_id: telegramId, status: "draft", ordering: "-created_at" },
   });
   if (Array.isArray(res.data) && res.data.length > 0) {
@@ -106,7 +102,7 @@ export async function getUserCart(telegramId) {
 }
 
 export async function getOrCreateCart(telegramId, username, phoneNumber, customerName) {
-  const res = await apiPublic.get(`/orders/`, {
+  const res = await apiPrivate.get(`/orders/`, {
     params: { telegram_id: telegramId, status: "draft" },
   });
   if (Array.isArray(res.data) && res.data.length > 0) {
@@ -122,25 +118,25 @@ export async function getOrCreateCart(telegramId, username, phoneNumber, custome
     total_cost: 0,
   };
 
-  const createRes = await apiPublic.post(`/orders/`, payload);
+  const createRes = await apiPrivate.post(`/orders/`, payload);
   return createRes.data;
 }
 
 export async function addItemToCart(orderId, productId, quantity, updateCart, telegramId, username, phoneNumber, customerName) {
   const payload = { order: orderId, product: productId, quantity };
-  await apiPublic.post(`/order-items/`, payload);
+  await apiPrivate.post(`/order-items/`, payload);
 
   const updatedCart = await getOrCreateCart(telegramId, username, phoneNumber, customerName);
   updateCart(updatedCart);
 }
 
 export async function updateCartItem(itemId, quantity) {
-  const res = await apiPublic.patch(`/order-items/${itemId}/`, { quantity });
+  const res = await apiPrivate.patch(`/order-items/${itemId}/`, { quantity });
   return res.data;
 }
 
 export async function removeCartItem(itemId) {
-  await apiPublic.delete(`/order-items/${itemId}/`);
+  await apiPrivate.delete(`/order-items/${itemId}/`);
   return true;
 }
 
@@ -148,26 +144,26 @@ export async function clearUserCart(telegramId) {
   const cart = await getUserCart(telegramId);
   if (!cart) return false;
 
-  await apiPublic.patch(`/orders/${cart.id}/`, { status: "canceled" });
+  await apiPrivate.patch(`/orders/${cart.id}/`, { status: "canceled" });
 
   for (const item of cart.items || []) {
-    await apiPublic.delete(`/order-items/${item.id}/`);
+    await apiPrivate.delete(`/order-items/${item.id}/`);
   }
 
   return true;
 }
 
 export async function confirmOrder(orderId) {
-  const res = await apiPublic.patch(`/orders/${orderId}/`, { status: "confirmed" });
+  const res = await apiPrivate.patch(`/orders/${orderId}/`, { status: "confirmed" });
   return res.data;
 }
 
 //
-// --- users (юзерские данные, нужен JWT) ---
+// --- users (приватный API) ---
 //
 export async function getUserByTelegramId(telegramId) {
   try {
-    const res = await apiPublic.get("/users/", { params: { telegram_id: telegramId } });
+    const res = await apiPrivate.get("/users/", { params: { telegram_id: telegramId } });
     if (Array.isArray(res.data)) return res.data[0] || null;
     if (res.data.results) return res.data.results[0] || null;
     return null;
@@ -179,7 +175,7 @@ export async function getUserByTelegramId(telegramId) {
 
 export async function createUser(userData) {
   try {
-    const res = await apiPublic.post("/users/", userData);
+    const res = await apiPrivate.post("/users/", userData);
     return res.data;
   } catch (err) {
     console.error("❌ Ошибка при создании пользователя:", err);
@@ -189,7 +185,7 @@ export async function createUser(userData) {
 
 export async function updateUser(userId, fields) {
   try {
-    const res = await apiPublic.patch(`/users/${userId}/`, fields);
+    const res = await apiPrivate.patch(`/users/${userId}/`, fields);
     return res.data;
   } catch (err) {
     console.error("❌ Ошибка при обновлении пользователя:", err);
