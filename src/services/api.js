@@ -7,18 +7,41 @@ if (!API_URL) {
   console.error("❌ API_URL не задан в .env.local");
 }
 
-const api = axios.create({
+// --- публичный API (фронт) ---
+export const apiPublic = axios.create({
+  baseURL: API_URL,
+  headers: { "ngrok-skip-browser-warning": "true" },
+});
+
+// --- приватный API (бот / сервисы) ---
+export const apiPrivate = axios.create({
   baseURL: API_URL,
   headers: {
     "X-API-KEY": API_SECRET_KEY,
-    "ngrok-skip-browser-warning": "true", // убираем экран ngrok
+    "ngrok-skip-browser-warning": "true",
   },
 });
 
+// --- интерцептор для JWT (работает на обоих клиентах) ---
+const attachAuthInterceptor = (instance) => {
+  instance.interceptors.request.use((config) => {
+    const token = localStorage.getItem("access");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  });
+};
+
+attachAuthInterceptor(apiPublic);
+attachAuthInterceptor(apiPrivate);
+
+//
 // --- авторизация через Telegram ---
+//
 export async function authWithTelegram(initDataString) {
   try {
-    const res = await api.post("/auth/telegram/", { auth_data: initDataString });
+    const res = await apiPublic.post("/auth/telegram/", { auth_data: initDataString });
 
     const { access, refresh } = res.data;
     if (access) localStorage.setItem("access", access);
@@ -31,51 +54,51 @@ export async function authWithTelegram(initDataString) {
   }
 }
 
-// Interceptor для токена
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("access");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-
-// --- категории ---
-export const getCategories = async () => {
-  const res = await api.get("/categories/");
+//
+// --- категории (публично) ---
+//
+export async function getCategories() {
+  const res = await apiPublic.get("/categories/");
   return res.data;
-};
+}
 
-// --- товары по категории ---
+//
+// --- товары (публично) ---
+//
 export async function getProducts(categoryId, page = 1) {
   let url = `/products/?page=${page}`;
-  if (categoryId) {
-    url += `&category=${categoryId}`;
-  }
-  const res = await api.get(url);
+  if (categoryId) url += `&category=${categoryId}`;
+  const res = await apiPublic.get(url);
   return res.data;
 }
 
-// --- поиск товаров ---
 export async function searchProducts(query) {
-  const res = await api.get(`/products/?search=${query}`);
+  const res = await apiPublic.get(`/products/?search=${query}`);
   return res.data;
 }
 
-// --- история заказов ---
+//
+// --- реклама (публично) ---
+//
+export async function getAds() {
+  const res = await apiPublic.get("/ads/");
+  return res.data.results || res.data;
+}
+
+//
+// --- история заказов (нужен JWT) ---
+//
 export async function getMyOrders(telegramId) {
-  if (!telegramId) {
-    throw new Error("❌ telegramId обязателен для getMyOrders");
-  }
-  const res = await api.get(`/orders/me/?telegram_id=${telegramId}`);
+  if (!telegramId) throw new Error("❌ telegramId обязателен для getMyOrders");
+  const res = await apiPublic.get(`/orders/me/?telegram_id=${telegramId}`);
   return res.data;
 }
 
-// --- корзина (draft заказ) ---
-
-// получить текущую корзину пользователя
+//
+// --- корзина ---
+//
 export async function getUserCart(telegramId) {
-  const res = await api.get(`/orders/`, {
+  const res = await apiPublic.get(`/orders/`, {
     params: { telegram_id: telegramId, status: "draft", ordering: "-created_at" },
   });
   if (Array.isArray(res.data) && res.data.length > 0) {
@@ -84,9 +107,8 @@ export async function getUserCart(telegramId) {
   return null;
 }
 
-// создать корзину или вернуть существующую
 export async function getOrCreateCart(telegramId, username, phoneNumber, customerName) {
-  const res = await api.get(`/orders/`, {
+  const res = await apiPublic.get(`/orders/`, {
     params: { telegram_id: telegramId, status: "draft" },
   });
   if (Array.isArray(res.data) && res.data.length > 0) {
@@ -102,66 +124,54 @@ export async function getOrCreateCart(telegramId, username, phoneNumber, custome
     total_cost: 0,
   };
 
-  const createRes = await api.post(`/orders/`, payload);
+  const createRes = await apiPublic.post(`/orders/`, payload);
   return createRes.data;
 }
 
-// добавить товар в корзину
-export async function addItemToCart(orderId, productId, quantity, updateCart) {
+export async function addItemToCart(orderId, productId, quantity, updateCart, telegramId, username, phoneNumber, customerName) {
   const payload = { order: orderId, product: productId, quantity };
-  await api.post(`/order-items/`, payload);
+  await apiPublic.post(`/order-items/`, payload);
 
   const updatedCart = await getOrCreateCart(telegramId, username, phoneNumber, customerName);
   updateCart(updatedCart);
 }
 
-// обновить количество товара в корзине
 export async function updateCartItem(itemId, quantity) {
-  const res = await api.patch(`/order-items/${itemId}/`, { quantity });
+  const res = await apiPublic.patch(`/order-items/${itemId}/`, { quantity });
   return res.data;
 }
 
-// удалить товар из корзины
 export async function removeCartItem(itemId) {
-  await api.delete(`/order-items/${itemId}/`);
+  await apiPublic.delete(`/order-items/${itemId}/`);
   return true;
 }
 
-// очистить корзину (отменить заказ и удалить товары)
 export async function clearUserCart(telegramId) {
   const cart = await getUserCart(telegramId);
   if (!cart) return false;
 
-  await api.patch(`/orders/${cart.id}/`, { status: "canceled" });
+  await apiPublic.patch(`/orders/${cart.id}/`, { status: "canceled" });
 
   for (const item of cart.items || []) {
-    await api.delete(`/order-items/${item.id}/`);
+    await apiPublic.delete(`/order-items/${item.id}/`);
   }
 
   return true;
 }
 
-// подтвердить заказ
 export async function confirmOrder(orderId) {
-  const res = await api.patch(`/orders/${orderId}/`, { status: "confirmed" });
+  const res = await apiPublic.patch(`/orders/${orderId}/`, { status: "confirmed" });
   return res.data;
 }
 
-
-// --- user api --- 
+//
+// --- users (юзерские данные, нужен JWT) ---
+//
 export async function getUserByTelegramId(telegramId) {
   try {
-    const res = await api.get("/users/", {
-      params: { telegram_id: telegramId },
-    });
-
-    // Поддержка и без пагинации, и с пагинацией
-    if (Array.isArray(res.data)) {
-      return res.data[0] || null;
-    }
-    if (res.data.results) {
-      return res.data.results[0] || null;
-    }
+    const res = await apiPublic.get("/users/", { params: { telegram_id: telegramId } });
+    if (Array.isArray(res.data)) return res.data[0] || null;
+    if (res.data.results) return res.data.results[0] || null;
     return null;
   } catch (err) {
     console.error("❌ Ошибка при получении пользователя:", err);
@@ -171,7 +181,7 @@ export async function getUserByTelegramId(telegramId) {
 
 export async function createUser(userData) {
   try {
-    const res = await api.post("/users/", userData);
+    const res = await apiPublic.post("/users/", userData);
     return res.data;
   } catch (err) {
     console.error("❌ Ошибка при создании пользователя:", err);
@@ -181,16 +191,10 @@ export async function createUser(userData) {
 
 export async function updateUser(userId, fields) {
   try {
-    const res = await api.patch(`/users/${userId}/`, fields);
+    const res = await apiPublic.patch(`/users/${userId}/`, fields);
     return res.data;
   } catch (err) {
     console.error("❌ Ошибка при обновлении пользователя:", err);
     throw err;
   }
-}
-
-// --- реклама ---
-export async function getAds() {
-  const res = await api.get("/ads/");
-  return res.data.results || res.data; // поддержка пагинации и без неё
 }
