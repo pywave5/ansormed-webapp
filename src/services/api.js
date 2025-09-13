@@ -86,7 +86,7 @@ export async function getMyOrders(telegramId) {
     params: { telegram_id: telegramId },
   });
   return res.data;
-
+}
 //
 // --- корзина (приватный API) ---
 //
