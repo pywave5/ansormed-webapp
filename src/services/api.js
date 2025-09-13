@@ -7,7 +7,8 @@ if (!API_URL) {
   console.error("API_URL не задан в .env.local");
 }
 
-// --- публичный API (без ключа) ---
+
+// --- публичный API ---
 export const apiPublic = axios.create({
   baseURL: API_URL,
 });
@@ -15,21 +16,20 @@ export const apiPublic = axios.create({
 // --- приватный API (JWT или X-API-KEY) ---
 export const apiPrivate = axios.create({
   baseURL: API_URL,
-  headers: {
-    "X-API-KEY": API_SECRET_KEY
-  },
 });
 
-// --- интерцептор для JWT ---
-const attachAuthInterceptor = (instance) => {
-  instance.interceptors.request.use((config) => {
-    const token = localStorage.getItem("access");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  });
-};
+// --- интерцептор ---
+// сначала пробуем JWT, если его нет — подставляем X-API-KEY
+apiPrivate.interceptors.request.use((config) => {
+  const token = localStorage.getItem("access");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+    delete config.headers["X-API-KEY"]; // на всякий случай убираем
+  } else {
+    config.headers["X-API-KEY"] = API_SECRET_KEY;
+  }
+  return config;
+});
 
 attachAuthInterceptor(apiPrivate);
 
