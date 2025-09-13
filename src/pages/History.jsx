@@ -5,13 +5,23 @@ import { useHaptic } from "../hooks/useHaptic";
 export default function History({ telegramId }) {
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [debug, setDebug] = useState(""); // 🟢 состояние для отладки
   const { tap } = useHaptic();
 
   useEffect(() => {
     if (telegramId) {
+      setDebug(`📡 Запрос на getMyOrders, telegramId=${telegramId}`);
       getMyOrders(telegramId)
-        .then(setOrders)
-        .catch((err) => console.error("Ошибка загрузки заказов:", err));
+        .then((data) => {
+          setOrders(data);
+          setDebug(`✅ Ответ получен: ${Array.isArray(data) ? data.length : 0} заказов`);
+        })
+        .catch((err) => {
+          setDebug(`❌ Ошибка: ${err.response?.status || "-"} ${err.response?.statusText || err.message}`);
+          console.error("Ошибка загрузки заказов:", err);
+        });
+    } else {
+      setDebug("⚠️ Нет telegramId, запрос не отправлен");
     }
   }, [telegramId]);
 
@@ -30,6 +40,13 @@ export default function History({ telegramId }) {
   return (
     <div className="p-4">
       <h2 className="text-gray-800 text-xl font-bold mb-4">История заказов</h2>
+
+      {/* 🔎 Блок отладки */}
+      <div className="mb-4 p-2 bg-yellow-100 text-yellow-800 rounded text-sm">
+        <p><b>Отладка:</b> {debug}</p>
+        <p>telegramId: {telegramId || "❌ пусто"}</p>
+      </div>
+
       {orders.length === 0 ? (
         <p className="text-gray-400">У вас пока нет заказов.</p>
       ) : (
@@ -56,15 +73,15 @@ export default function History({ telegramId }) {
         </div>
       )}
 
-     {/* Модалка с деталями */}
+      {/* Модалка с деталями */}
       {selectedOrder && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-          onClick={() => setSelectedOrder(null)} // клик по внешке
+          onClick={() => setSelectedOrder(null)}
         >
           <div
             className="bg-white text-black rounded-xl p-6 w-96 max-h-[90vh] overflow-y-auto shadow-lg"
-            onClick={(e) => e.stopPropagation()} // блокируем закрытие при клике внутри
+            onClick={(e) => e.stopPropagation()}
           >
             <h3 className="text-lg font-bold mb-3">
               Заказ №{selectedOrder.id}
@@ -77,7 +94,6 @@ export default function History({ telegramId }) {
               {formatPrice(selectedOrder.total_cost)}
             </p>
 
-            {/* Список товаров */}
             {selectedOrder.items && selectedOrder.items.length > 0 ? (
               <ul className="mt-4 space-y-3">
                 {selectedOrder.items.map((item) => (
