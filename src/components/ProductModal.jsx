@@ -33,7 +33,7 @@ export default function ProductModal({ product, onClose }) {
   };
 
   const handleAddToCart = () => {
-    addToCart(product, quantity); // 🚀 напрямую вызываем mutation
+    addToCart(product.id, quantity);
     success();
     onClose();
   };
