@@ -93,11 +93,11 @@ export async function getMyOrders(telegramId) {
   }
 }
 //
-// --- корзина (приватный API) ---
+// --- корзина (приватный API, через JWT) ---
 //
-export async function getUserCart(telegramId) {
+export async function getUserCart() {
   const res = await apiPrivate.get(`/orders/`, {
-    params: { telegram_id: telegramId, status: "draft", ordering: "-created_at" },
+    params: { status: "draft", ordering: "-created_at" },
   });
   if (Array.isArray(res.data) && res.data.length > 0) {
     return res.data[0];
@@ -105,33 +105,23 @@ export async function getUserCart(telegramId) {
   return null;
 }
 
-export async function getOrCreateCart(telegramId, username, phoneNumber, customerName) {
+export async function getOrCreateCart() {
   const res = await apiPrivate.get(`/orders/`, {
-    params: { telegram_id: telegramId, status: "draft" },
+    params: { status: "draft" },
   });
   if (Array.isArray(res.data) && res.data.length > 0) {
     return res.data[0];
   }
 
-  const payload = {
-    telegram_id: telegramId,
-    user_name: username,
-    phone_number: phoneNumber,
-    customer_name: customerName,
-    status: "draft",
-    total_cost: 0,
-  };
-
+  const payload = { status: "draft", total_cost: 0 };
   const createRes = await apiPrivate.post(`/orders/`, payload);
   return createRes.data;
 }
 
-export async function addItemToCart(orderId, productId, quantity, updateCart, telegramId, username, phoneNumber, customerName) {
+export async function addItemToCart(orderId, productId, quantity = 1) {
   const payload = { order: orderId, product: productId, quantity };
-  await apiPrivate.post(`/order-items/`, payload);
-
-  const updatedCart = await getOrCreateCart(telegramId, username, phoneNumber, customerName);
-  updateCart(updatedCart);
+  const res = await apiPrivate.post(`/order-items/`, payload);
+  return res.data;
 }
 
 export async function updateCartItem(itemId, quantity) {
@@ -144,8 +134,8 @@ export async function removeCartItem(itemId) {
   return true;
 }
 
-export async function clearUserCart(telegramId) {
-  const cart = await getUserCart(telegramId);
+export async function clearUserCart() {
+  const cart = await getUserCart();
   if (!cart) return false;
 
   await apiPrivate.patch(`/orders/${cart.id}/`, { status: "canceled" });
@@ -156,6 +146,7 @@ export async function clearUserCart(telegramId) {
 
   return true;
 }
+
 
 export async function confirmOrder(orderId) {
   const res = await apiPrivate.patch(`/orders/${orderId}/`, { status: "confirmed" });

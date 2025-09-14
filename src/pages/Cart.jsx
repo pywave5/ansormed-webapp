@@ -5,14 +5,25 @@ import emptyCart from "../media/empty-cart.png";
 import { useHaptic } from "../hooks/useHaptic";
 
 export default function Cart() {
-  const { cart, removeFromCart, clearCart } = useCart();
+  const { cart, removeFromCart, clearCart, createOrder } = useCart(); // ✅ добавляем createOrder
   const { tap } = useHaptic();
   const [orderPlaced, setOrderPlaced] = useState(false);
 
-  const handleOrder = () => {
+  const handleOrder = async () => {
     tap();
-    clearCart();         // сразу очищаем корзину
-    setOrderPlaced(true); // показываем экран подтверждения
+    try {
+      // ✅ отправляем заказ на бек
+      await createOrder(cart);
+
+      // ✅ очищаем корзину
+      clearCart();
+
+      // ✅ показываем экран подтверждения
+      setOrderPlaced(true);
+    } catch (err) {
+      console.error("Ошибка при создании заказа:", err);
+      alert("Не удалось оформить заказ. Попробуйте снова.");
+    }
   };
 
   const handleConfirm = () => {
