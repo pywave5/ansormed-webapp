@@ -132,7 +132,7 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <div className="min-h-screen bg-gray-100 pb-24">
         <Header headerPadding={headerPadding} headerSize={headerSize} variant={activePage} />
-        <p className="text-xs text-gray-400">debug telegramId: {telegramId}</p>
+
         <div className={`max-w-6xl mx-auto p-6 space-y-8 ${headerPadding}`}>
           {activePage === "catalog" && <CatalogWithProducts />}
           {activePage === "cart" && <Cart />}

@@ -78,11 +78,19 @@ export async function getAds() {
 // --- история заказов (нужен JWT или X-API-KEY) ---
 //
 export async function getMyOrders(telegramId) {
-  if (!telegramId) throw new Error("telegramId обязателен для getMyOrders");
-  const res = await apiPrivate.get(`/orders/me/`, {
-    params: { telegram_id: telegramId },
-  });
-  return res.data;
+  const token = localStorage.getItem("access");
+  if (token) {
+    // JWT сценарий
+    const res = await apiPrivate.get(`/orders/me/`);
+    return res.data;
+  } else {
+    // API-KEY сценарий
+    if (!telegramId) throw new Error("telegramId обязателен для getMyOrders");
+    const res = await apiPrivate.get(`/orders/me/`, {
+      params: { telegram_id: telegramId },
+    });
+    return res.data;
+  }
 }
 //
 // --- корзина (приватный API) ---
