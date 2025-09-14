@@ -4,26 +4,20 @@ import { Trash2, CheckCircle2 } from "lucide-react";
 import emptyCart from "../media/empty-cart.png";
 import { useHaptic } from "../hooks/useHaptic";
 
-export default function Cart() {
-  const { cart, removeFromCart, clearCart, createOrder } = useCart(); // ✅ добавляем createOrder
+export default function Cart({ telegramId, username, phoneNumber, customerName }) {
+  const { cart, removeFromCart, clearCart, confirmOrder } = useCart(
+    telegramId,
+    username,
+    phoneNumber,
+    customerName
+  );
   const { tap } = useHaptic();
   const [orderPlaced, setOrderPlaced] = useState(false);
 
   const handleOrder = async () => {
     tap();
-    try {
-      // ✅ отправляем заказ на бек
-      await createOrder(cart);
-
-      // ✅ очищаем корзину
-      clearCart();
-
-      // ✅ показываем экран подтверждения
-      setOrderPlaced(true);
-    } catch (err) {
-      console.error("Ошибка при создании заказа:", err);
-      alert("Не удалось оформить заказ. Попробуйте снова.");
-    }
+    await confirmOrder(); // подтверждаем заказ в API
+    setOrderPlaced(true);
   };
 
   const handleConfirm = () => {
@@ -51,7 +45,7 @@ export default function Cart() {
     );
   }
 
-  if (!cart || cart.length === 0) {
+  if (!cart || !cart.items || cart.items.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[70vh] text-gray-700 p-4">
         <img
@@ -69,8 +63,8 @@ export default function Cart() {
     );
   }
 
-  const totalCost = cart.reduce(
-    (sum, item) => sum + item.quantity * (item.final_price || 0),
+  const totalCost = cart.items.reduce(
+    (sum, item) => sum + item.quantity * (item.product.final_price || 0),
     0
   );
 
@@ -81,31 +75,31 @@ export default function Cart() {
       </h1>
 
       <ul className="space-y-3">
-        {cart.map((item) => (
+        {cart.items.map((item) => (
           <li
             key={item.id}
             className="flex items-center gap-3 bg-white border rounded-xl p-3 shadow-sm"
           >
-            {item.image && (
+            {item.product.image && (
               <img
-                src={item.image}
-                alt={item.title || "Товар"}
+                src={item.product.image}
+                alt={item.product.title || "Товар"}
                 className="w-14 h-14 sm:w-16 sm:h-16 object-cover rounded-lg border flex-shrink-0"
               />
             )}
 
             <div className="flex-1 min-w-0">
               <p className="font-semibold text-gray-900 text-sm sm:text-base truncate">
-                {item.title || "Без названия"}
+                {item.product.title || "Без названия"}
               </p>
               <p className="text-xs sm:text-sm text-gray-700">
-                {item.quantity || 1} шт ×{" "}
-                {item.final_price
-                  ? item.final_price.toLocaleString() + " сум"
+                {item.quantity} шт ×{" "}
+                {item.product.final_price
+                  ? item.product.final_price.toLocaleString() + " сум"
                   : "—"}
-                {item.discount > 0 && item.price && (
+                {item.product.discount > 0 && item.product.price && (
                   <span className="line-through ml-2 text-gray-400">
-                    {item.price.toLocaleString()} сум
+                    {item.product.price.toLocaleString()} сум
                   </span>
                 )}
               </p>
@@ -113,12 +107,12 @@ export default function Cart() {
 
             <div className="flex flex-col items-end gap-2 sm:flex-row sm:items-center sm:gap-3 flex-shrink-0">
               <p className="font-bold text-green-600 text-sm sm:text-base whitespace-nowrap">
-                {(item.quantity * (item.final_price || 0)).toLocaleString()} сум
+                {(item.quantity * (item.product.final_price || 0)).toLocaleString()} сум
               </p>
               <button
                 onClick={() => {
                   tap();
-                  removeFromCart(item.id);
+                  removeFromCart(item.id); // <-- теперь правильный id ордер-айтема
                 }}
                 className="p-2 rounded-full hover:bg-red-100 transition flex-shrink-0"
               >
