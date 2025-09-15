@@ -80,7 +80,7 @@ export default function Profile({ user, setUser }) {
         <ProfileField
           label="Номер телефона"
           value={formatPhone(user.phone_number)}
-          onClick={() => setEditingField("phone_number")}
+          onClick={null}
         />
         <ProfileField
           label="Дата рождения"
@@ -99,8 +99,6 @@ export default function Profile({ user, setUser }) {
             ? "Имя"
             : editingField === "last_name"
             ? "Фамилия"
-            : editingField === "phone_number"
-            ? "Номер телефона"
             : editingField === "birth_date"
             ? "Дата рождения"
             : "E-mail"
