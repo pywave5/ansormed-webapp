@@ -76,6 +76,7 @@ export default function Profile({ user, setUser }) {
 
       <div className="bg-white shadow-md rounded-2xl p-4">
         <ProfileField label="Имя" value={user.first_name} onClick={() => setEditingField("first_name")} />
+        <ProfileField label="Фамилия" value={user.last_name} onClick={() => setEditingField("last_name")} />
         <ProfileField
           label="Номер телефона"
           value={formatPhone(user.phone_number)}
@@ -96,6 +97,8 @@ export default function Profile({ user, setUser }) {
         label={
           editingField === "first_name"
             ? "Имя"
+            : editingField === "last_name"
+            ? "Фамилия"
             : editingField === "phone_number"
             ? "Номер телефона"
             : editingField === "birth_date"
