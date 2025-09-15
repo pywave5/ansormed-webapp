@@ -36,6 +36,42 @@ export function useCart(telegramId, username, phoneNumber, customerName) {
         customerName
       );
     },
+    // оптимистическое обновление
+    onMutate: async ({ productId, quantity }) => {
+      await queryClient.cancelQueries(CART_KEY);
+
+      const prevCart = queryClient.getQueryData(CART_KEY);
+
+      // обновляем корзину сразу
+      queryClient.setQueryData(CART_KEY, (old) => {
+        if (!old) return prevCart;
+
+        const exists = old.items.find((i) => i.product.id === productId);
+        let newItems;
+        if (exists) {
+          newItems = old.items.map((i) =>
+            i.product.id === productId
+              ? { ...i, quantity: i.quantity + quantity }
+              : i
+          );
+        } else {
+          newItems = [
+            ...old.items,
+            { id: Date.now(), product: { id: productId }, quantity },
+          ];
+        }
+
+        return { ...old, items: newItems };
+      });
+
+      return { prevCart };
+    },
+    // если ошибка — откат
+    onError: (err, variables, context) => {
+      if (context?.prevCart) {
+        queryClient.setQueryData(CART_KEY, context.prevCart);
+      }
+    },
   });
 
   // Обновить количество
